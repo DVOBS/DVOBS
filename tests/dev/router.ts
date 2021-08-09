@@ -7,7 +7,7 @@ const routes: Array<RouteConfig> = [
   {
     path: '/',
     name: 'Home',
-    component: () => import(/* webpackChunkName: "project-editor-page" */ '@/views/ProjectEditorPage.vue')
+    component: () => import('./views/VueFileEditorTest.vue')
   }
 ]
 

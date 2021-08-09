@@ -5,7 +5,7 @@
     @contextmenu.stop.prevent="handleContextmenu"
   >
     <div class="directory"
-      :class="{ expanded }"
+      :class="{ expanded, fade }"
       v-if="!root"
       @click="expanded = !expanded"
     >
@@ -44,6 +44,15 @@
         :key="item.name"
       ></FileItem>
     </div>
+    <ContextMenu ref="contextMenu">
+      <MeunItem label="新建文件" @click="openCrfeateNew('file')"></MeunItem>
+      <MeunItem label="新建文件夹" @click="openCrfeateNew('directory')"></MeunItem>
+      <MeunItem label="文件夹内查找"></MeunItem>
+      <MeunItem label="复制路径"></MeunItem>
+      <MeunItemSplitLine></MeunItemSplitLine>
+      <MeunItem label="重命名" @click="nameEditor.startInput()"></MeunItem>
+      <MeunItem label="删除"></MeunItem>
+    </ContextMenu>
   </div>
 </template>
 <script lang="ts">
@@ -56,6 +65,10 @@ import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
 import FileItem from './FileItem.vue'
 import NameEditor from './NameEditor.vue'
 import CreateNew from './CreateNew.vue'
+import ContextMenu from '@/core/project-editor/context-menu/ContextMenu.vue'
+import MeunItem from '@/core/project-editor/context-menu/MeunItem.vue'
+import MeunItemSplitLine from '@/core/project-editor/context-menu/MeunItemSplitLine.vue'
+import FileExplorer from './FileExplorer.vue'
 
 @Component({
   name: 'DirectoryItem',
@@ -63,15 +76,24 @@ import CreateNew from './CreateNew.vue'
     FontAwesomeIcon,
     FileItem,
     NameEditor,
-    CreateNew
+    CreateNew,
+    ContextMenu,
+    MeunItem,
+    MeunItemSplitLine
   }
 })
 export default class DirectoryItem extends Vue {
   @Inject('projectEditor')
   private projectEditor!: ProjectEditor
 
+  @Inject('fileExplorer')
+  private fileExplorer!: FileExplorer
+
   @Ref()
   private nameEditor!: NameEditor
+
+  @Ref()
+  private contextMenu! :ContextMenu
 
   @Prop()
   public directory!: ProjectDirectory
@@ -86,6 +108,10 @@ export default class DirectoryItem extends Vue {
   private root!: boolean
 
   private expanded = false;
+
+  private get fade() {
+    return this.fileExplorer.fade
+  }
 
   public get siblings() {
     if (this.$parent instanceof DirectoryItem) {
@@ -106,41 +132,42 @@ export default class DirectoryItem extends Vue {
   }
 
   private handleContextmenu(event: MouseEvent) {
-    const meunItems = [{
-        name: '新建文件',
-        handler: () => { this.openCrfeateNew('file') }
-      }, {
-        name: '新建文件夹',
-        handler: () => { this.openCrfeateNew('directory') }
-      }, {
-        name: 'split-line'
-      }, {
-        name: '文件夹内查找',
-        handler: () => { /*  */}
-      }, {
-        name: '复制路径',
-        handler: () => { /*  */}
-      }
-    ]
+    this.contextMenu.open(event.clientX, event.clientY)
+    // const meunItems = [{
+    //     name: '新建文件',
+    //     handler: () => { this.openCrfeateNew('file') }
+    //   }, {
+    //     name: '新建文件夹',
+    //     handler: () => { this.openCrfeateNew('directory') }
+    //   }, {
+    //     name: 'split-line'
+    //   }, {
+    //     name: '文件夹内查找',
+    //     handler: () => { /*  */}
+    //   }, {
+    //     name: '复制路径',
+    //     handler: () => { /*  */}
+    //   }
+    // ]
 
-    if (!this.root) {
-      meunItems.push({
-        name: 'split-line'
-      }, {
-        name: '重命名',
-        handler: () => {
-          // this.nameEditor.startInput()
-        }
-      }, {
-        name: '删除',
-        handler: async () => {
-          try {
-            await MessageBox.confirm(`是否删除文件 ${this.directory.name} ！`, '警告')
-            this.remove()
-          } catch (error) {/*  */}
-        }
-      })
-    }
+    // if (!this.root) {
+    //   meunItems.push({
+    //     name: 'split-line'
+    //   }, {
+    //     name: '重命名',
+    //     handler: () => {
+    //       // this.nameEditor.startInput()
+    //     }
+    //   }, {
+    //     name: '删除',
+    //     handler: async () => {
+    //       try {
+    //         await MessageBox.confirm(`是否删除文件 ${this.directory.name} ！`, '警告')
+    //         this.remove()
+    //       } catch (error) {/*  */}
+    //     }
+    //   })
+    // }
 
     // this.appEditor.openContextmenu(event, meunItems)
   }
@@ -159,7 +186,7 @@ export default class DirectoryItem extends Vue {
       } else {
         createNew = this.$refs.fileCreateNew as CreateNew
       }
-      // createNew.open()
+      createNew.open()
     })
   }
 
@@ -190,6 +217,9 @@ $folderColor: #90a4ae;
     line-height: 26px;
     color: #babaca;
     cursor: pointer;
+  }
+  .fade {
+    opacity: 0.25;
   }
   .arrow-icon {
     display: inline-block;

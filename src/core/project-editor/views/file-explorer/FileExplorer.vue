@@ -8,7 +8,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Inject } from 'vue-property-decorator'
+import { Component, Vue, Inject, Provide } from 'vue-property-decorator'
 import ProjectDirectory from '@/core/model/ProjectDirectory'
 import ProjectFile from '@/core/model/ProjectFile'
 import Project from '@/core/model/Project'
@@ -19,8 +19,15 @@ import DirectoryItem from './DirectoryItem.vue'
   components: { DirectoryItem }
 })
 export default class FileExplorer extends Vue {
+  @Provide('fileExplorer')
+  private get FileExplorer() {
+    return this
+  }
+
   @Inject('projectEditor')
   private projectEditor!: ProjectEditor
+
+  public fade = false
 
   private selected: (ProjectDirectory|ProjectFile)[]  = []
 

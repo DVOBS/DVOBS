@@ -1,7 +1,7 @@
 <template>
   <div
     class="FileItem"
-    :class="{ 'is-selected': isSelected }"
+    :class="{ 'is-selected': isSelected, fade }"
     @click="handleClick"
     @dblclick="handleDbClick"
     @contextmenu.stop.prevent="handleContextmenu"
@@ -29,6 +29,7 @@ import ProjectFile from '@/core/model/ProjectFile'
 import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
 import NameEditor from './NameEditor.vue'
 import DirectoryItem from './DirectoryItem.vue'
+import FileExplorer from './FileExplorer.vue'
 
 @Component({
   components: {
@@ -40,6 +41,9 @@ export default class FileItem extends Vue {
   @Inject('projectEditor')
   private projectEditor!: ProjectEditor
 
+  @Inject('fileExplorer')
+  private fileExplorer!: FileExplorer
+
   @Ref()
   private nameEditor!: NameEditor
 
@@ -48,6 +52,10 @@ export default class FileItem extends Vue {
 
   @Prop()
   private selected!: (ProjectDirectory | ProjectFile)[]
+
+  private get fade() {
+    return this.fileExplorer.fade
+  }
 
   public get isSelected () {
     return this.selected.indexOf(this.file) !== -1
@@ -103,6 +111,9 @@ export default class FileItem extends Vue {
   color: #babaca;
   cursor: pointer;
   padding: 0 10px;
+  &.fade {
+    opacity: 0.25;
+  }
   .object-type-icon {
     display: inline-block;
     position: relative;

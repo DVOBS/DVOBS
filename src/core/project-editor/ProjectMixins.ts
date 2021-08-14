@@ -1,18 +1,29 @@
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 
 import Jszip from 'jszip'
-import { decode } from 'js-base64'
 import axios from 'axios'
+import throttle from 'lodash.throttle'
+import localforage from 'localforage'
 
 import Project from '@/core/model/Project'
 import ProjectDirectory from '@/core/model/ProjectDirectory'
 import ProjectFile from '@/core/model/ProjectFile'
+import { JsonConvert } from 'json2typescript'
 
 @Component
 export default class ProjectMixins extends Vue {
   public project: Project | null = null
 
-  private getDefaultProject() {
+  @Watch('project', { deep: true })
+  public async projectChange(project: Project) {
+    this.saveChange(project)
+  }
+
+  public saveChange = throttle((project) => {
+    localforage.setItem('project', project)
+  }, 100)
+
+  public getDefaultProject() {
     axios({
       method: 'get',
       url: './ProjectExamples.zip',
@@ -24,7 +35,7 @@ export default class ProjectMixins extends Vue {
     })
   }
 
-  private async importProjectZipFile(file: File) {
+  public async importProjectZipFile(file: File) {
     try {
       const project = new Project()
       const { files } = await Jszip.loadAsync(file)
@@ -52,13 +63,13 @@ export default class ProjectMixins extends Vue {
         } else {
           const base64 = await file.async('base64')
           // const content = await file.async('string')
-          const content = decode(base64)
+          // const content = decode(base64)
           // console.log(content)
           // console.log('base64 check is')
           // console.log(base64 === encode(content))
           const array = key.split('/')
           const newFile = new ProjectFile()
-          newFile.content = content
+          // newFile.content = content
           newFile.base64 = base64
           if (array && array.length > 1) {
             // console.log(array)
@@ -80,9 +91,14 @@ export default class ProjectMixins extends Vue {
     }
   }
 
-  private mounted() {
+  public async mounted() {
     if (!this.project) {
-      this.getDefaultProject()
+      const projectPlainObject = await localforage.getItem('project')
+      if (projectPlainObject) {
+        this.project = new JsonConvert().deserializeObject(projectPlainObject, Project)
+      } else {
+        this.getDefaultProject()
+      }
     }
   }
 }

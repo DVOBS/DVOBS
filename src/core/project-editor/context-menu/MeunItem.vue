@@ -8,15 +8,15 @@ import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
 @Component
 export default class MeunItem extends Vue {
   @Inject('projectEditor')
-  private projectEditor!: ProjectEditor
+  public projectEditor!: ProjectEditor
 
   @Prop({ type: String, required: true})
-  private label!: string
+  public label!: string
 
   @Prop({ type: Boolean, required: false, default: false})
-  private disable!: boolean
+  public disable!: boolean
 
-  private handelClick() {
+  public handelClick() {
     this.$emit('click')
     this.projectEditor.closeContextMenu()
   }

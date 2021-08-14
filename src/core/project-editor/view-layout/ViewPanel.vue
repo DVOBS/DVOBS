@@ -13,21 +13,20 @@ export default class ViewPanel extends Vue {
   public layout!: ViewLayout
 
   @Prop({ type: String, required: true })
-  private label!: string
+  public label!: string
 
   @Prop({ type: String, required: true })
-  private name!: string
+  public name!: string
 
-  @Prop({ type: String, required: true })
-  private  position!: 'left' | 'right' | 'bottom'
+  public mounted() {
+    this.$set(this.layout.viewinfoMap, this.name, {
+      name: this.name,
+      label: this.label
+    })
+  }
 
-  private created() {
-    if (this.position === 'left') {
-      this.layout.leftViews.push({
-        name: this.name,
-        label: this.label
-      })
-    }
+  public beforeDestroy() {
+    this.$delete(this.layout.viewinfoMap, this.name)
   }
 }
 </script>

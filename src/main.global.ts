@@ -2,8 +2,11 @@ import Vue from 'vue'
 
 import ElementUI from 'element-ui'
 import PortalVue from 'portal-vue'
+import draggable from "vuedraggable"
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+import CoordinateSystem from '@/core/common/coordinate-system/CoordinateSystem.vue'
 
 import 'element-ui/lib/theme-chalk/index.css'
 import 'normalize.css'
@@ -57,3 +60,5 @@ library.add(faCogs)
 Vue.use(PortalVue)
 Vue.use(ElementUI)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
+Vue.component('vue-drag', draggable)
+Vue.component('coordinate-system', CoordinateSystem)

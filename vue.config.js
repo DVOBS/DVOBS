@@ -1,6 +1,12 @@
 /* eslint-disable*/
 const config= {
-
+  publicPath: '',
+  pages: {
+    index: 'src/main.ts'
+  },
+  transpileDependencies: [
+    'resize-detector'
+  ]
 }
 
 if (process.env.NODE_ENV !== 'production') {

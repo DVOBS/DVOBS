@@ -44,12 +44,12 @@ function isValidFileName (fileName: string) {
 })
 export default class NameEditor extends Vue {
   @Prop({ type: String, required: true })
-  private value!: string;
+  public value!: string;
 
-  private innerValue = '123';
-  private inputShowed = false;
+  public innerValue = '123';
+  public inputShowed = false;
 
-  private get error () {
+  public get error () {
     if (!isValidFileName(this.innerValue)) {
       return '文件名不合法'
     }
@@ -69,7 +69,7 @@ export default class NameEditor extends Vue {
   }
 
   @Watch('inputShowed')
-  private inputShowedChange () {
+  public inputShowedChange () {
     if(!this.inputShowed) {
       this.$emit('hidden')
     }
@@ -83,22 +83,22 @@ export default class NameEditor extends Vue {
     })
   }
 
-  private handleIconClick () {
+  public handleIconClick () {
     this.startInput()
   }
 
-  private handleEnter () {
+  public handleEnter () {
     if (this.error) {
       return
     }
     this.inputShowed = false
   }
 
-  private handeleEsc () {
+  public handeleEsc () {
     (this.$refs.input as HTMLElement).blur()
   }
 
-  private handelBlur() {
+  public handelBlur() {
     (this.$el as HTMLElement).scrollTo(0, 0)
     if (this.value !== this.innerValue && !this.error) {
       this.changeName()
@@ -109,11 +109,11 @@ export default class NameEditor extends Vue {
     })
   }
 
-  private changeName() {
+  public changeName() {
     this.$emit('input', this.innerValue);
   }
 
-  private created () {
+  public created () {
     this.innerValue = this.value
   }
 }

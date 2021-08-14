@@ -49,10 +49,10 @@ import FileExplorer from './FileExplorer.vue'
 })
 export default class CreateNew extends Vue {
   @Prop({ default: false })
-  private isDirectory!: boolean
+  public isDirectory!: boolean
 
   @Inject('fileExplorer')
-  private fileExplorer!: FileExplorer
+  public fileExplorer!: FileExplorer
 
   public get siblings() {
     if (this.$parent instanceof DirectoryItem) {
@@ -63,9 +63,9 @@ export default class CreateNew extends Vue {
     return []
   }
 
-  private show = false
+  public show = false
 
-  private name = ''
+  public name = ''
 
   public open() {
     this.name = this.isDirectory? 'newFolder' : 'newFile'
@@ -83,7 +83,7 @@ export default class CreateNew extends Vue {
     this.name = ''
   }
 
-  private handleInput() {
+  public handleInput() {
     this.show = false
     if (this.$parent instanceof DirectoryItem) {
       const directorys = this.$parent.directory.directorys

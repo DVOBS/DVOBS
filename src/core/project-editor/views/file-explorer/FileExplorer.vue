@@ -20,22 +20,22 @@ import DirectoryItem from './DirectoryItem.vue'
 })
 export default class FileExplorer extends Vue {
   @Provide('fileExplorer')
-  private get FileExplorer() {
+  public get FileExplorer() {
     return this
   }
 
   @Inject('projectEditor')
-  private projectEditor!: ProjectEditor
+  public projectEditor!: ProjectEditor
 
   public fade = false
 
-  private selected: (ProjectDirectory|ProjectFile)[]  = []
+  public selected: (ProjectDirectory|ProjectFile)[]  = []
 
-  private get project() {
+  public get project() {
     return this.projectEditor.project || new Project()
   }
 
-  private get rootDirectory() {
+  public get rootDirectory() {
     return this.project.rootDirectory
   }
 }

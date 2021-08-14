@@ -24,6 +24,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Inject, Ref } from 'vue-property-decorator'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { getEditorInfo } from '@/core/objects-editor/objectEditorUtil'
 import ProjectDirectory from '@/core/model/ProjectDirectory'
 import ProjectFile from '@/core/model/ProjectFile'
 import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
@@ -39,21 +40,21 @@ import FileExplorer from './FileExplorer.vue'
 })
 export default class FileItem extends Vue {
   @Inject('projectEditor')
-  private projectEditor!: ProjectEditor
+  public projectEditor!: ProjectEditor
 
   @Inject('fileExplorer')
-  private fileExplorer!: FileExplorer
+  public fileExplorer!: FileExplorer
 
   @Ref()
-  private nameEditor!: NameEditor
+  public nameEditor!: NameEditor
 
   @Prop()
-  private file!: ProjectFile
+  public file!: ProjectFile
 
   @Prop()
-  private selected!: (ProjectDirectory | ProjectFile)[]
+  public selected!: (ProjectDirectory | ProjectFile)[]
 
-  private get fade() {
+  public get fade() {
     return this.fileExplorer.fade
   }
 
@@ -71,28 +72,31 @@ export default class FileItem extends Vue {
     return []
   }
 
-
-  private get icon() {
-    return ['far', 'file']
+  public get editorInfo() {
+    return getEditorInfo(this.file)
   }
 
-  private get iconColor() {
-    return '#cd853f'
+  public get icon() {
+    return this.editorInfo.icon
   }
 
-  private handleContextmenu(event: MouseEvent) {
+  public get iconColor() {
+    return this.editorInfo.color
+  }
+
+  public handleContextmenu(event: MouseEvent) {
     console.log(event)
   }
 
-  private handleClick() {
-    //
+  public handleClick() {
+    this.projectEditor.openObjectEditor(this.file, true)
   }
 
-  private handleDbClick() {
-    //
+  public handleDbClick() {
+    this.projectEditor.openObjectEditor(this.file)
   }
 
-  private remove() {
+  public remove() {
     const parent = this.$parent as DirectoryItem
     const directorys = parent.directory.files
     const index = directorys.indexOf(this.file)

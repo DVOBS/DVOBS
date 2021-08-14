@@ -11,9 +11,9 @@ import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
 @Component
 export default class ContextMenu extends Vue {
   @Inject('projectEditor')
-  private projectEditor!: ProjectEditor
+  public projectEditor!: ProjectEditor
 
-  private id = shortid.generate()
+  public id = shortid.generate()
 
   public open(x: number, y: number) {
     this.projectEditor.openContextMenu(this.id, x, y)

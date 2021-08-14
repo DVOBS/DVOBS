@@ -58,7 +58,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Inject, Ref } from 'vue-property-decorator'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { MessageBox } from 'element-ui'
+// import { MessageBox } from 'element-ui'
 import ProjectDirectory from '@/core/model/ProjectDirectory'
 import ProjectFile from '@/core/model/ProjectFile'
 import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
@@ -84,32 +84,32 @@ import FileExplorer from './FileExplorer.vue'
 })
 export default class DirectoryItem extends Vue {
   @Inject('projectEditor')
-  private projectEditor!: ProjectEditor
+  public projectEditor!: ProjectEditor
 
   @Inject('fileExplorer')
-  private fileExplorer!: FileExplorer
+  public fileExplorer!: FileExplorer
 
   @Ref()
-  private nameEditor!: NameEditor
+  public nameEditor!: NameEditor
 
   @Ref()
-  private contextMenu! :ContextMenu
+  public contextMenu! :ContextMenu
 
   @Prop()
   public directory!: ProjectDirectory
 
   @Prop()
-  private selected!: (ProjectDirectory | ProjectFile)[]
+  public selected!: (ProjectDirectory | ProjectFile)[]
 
   @Prop({
     required: false,
     default: false
   })
-  private root!: boolean
+  public root!: boolean
 
-  private expanded = false;
+  public expanded = false;
 
-  private get fade() {
+  public get fade() {
     return this.fileExplorer.fade
   }
 
@@ -123,15 +123,15 @@ export default class DirectoryItem extends Vue {
     return []
   }
 
-  private get directorys() {
+  public get directorys() {
     return this.directory.directorys
   }
 
-  private get files() {
+  public get files() {
     return this.directory.files
   }
 
-  private handleContextmenu(event: MouseEvent) {
+  public handleContextmenu(event: MouseEvent) {
     this.contextMenu.open(event.clientX, event.clientY)
     // const meunItems = [{
     //     name: '新建文件',
@@ -172,12 +172,12 @@ export default class DirectoryItem extends Vue {
     // this.appEditor.openContextmenu(event, meunItems)
   }
 
-  private blur () {
+  public blur () {
     const newInput = this.$refs.newInput as HTMLInputElement
     newInput.blur()
   }
 
-  private openCrfeateNew(type: string) {
+  public openCrfeateNew(type: string) {
     this.expanded = true
     this.$nextTick(() => {
       let createNew!: CreateNew
@@ -190,7 +190,7 @@ export default class DirectoryItem extends Vue {
     })
   }
 
-  private remove() {
+  public remove() {
     const parent = this.$parent as DirectoryItem
     const directorys = parent.directory.directorys
     const index = directorys.indexOf(this.directory)

@@ -49,6 +49,12 @@
       >
         <p>数据查看器</p>
       </ViewPanel>
+      <ViewPanel
+        label="控制台"
+        name="console"
+      >
+        <p>控制台</p>
+      </ViewPanel>
     </ViewLayout>
     <div
       class="context-menu-mask"

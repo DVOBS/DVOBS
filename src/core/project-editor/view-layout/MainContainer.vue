@@ -34,21 +34,28 @@
         />
       </svg>
       <div class="drag-reminder" :class="dragPostion"></div>
-      <portal-target
+      <!-- <portal-target
+        class="portal-target"
         :name="node.name"
-      ></portal-target>
+      ></portal-target> -->
+      <CrossRenderView
+        class="portal-target"
+        :name="node.name"
+      ></CrossRenderView>
     </div>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Inject, Prop } from 'vue-property-decorator'
-import ViewLayout from './ViewLayout.vue'
 import draggable from "vuedraggable"
+import ViewLayout from './ViewLayout.vue'
 import { MainLayoutNode } from './layout'
+import CrossRenderView from '@/core/common/cross-render/CrossRenderView.vue'
 
 @Component({
   components: {
     'vue-drag': draggable,
+    CrossRenderView
   }
 })
 export default class MainContainer extends Vue {
@@ -89,6 +96,10 @@ export default class MainContainer extends Vue {
     box-shadow: 0px -1px 0px 0px #181818;
   }
 
+  .portal-target {
+    height: 100%;
+  }
+
   .drag-area {
     position: absolute;
     display: block;
@@ -104,7 +115,8 @@ export default class MainContainer extends Vue {
 
   .drag-reminder {
     position: absolute;
-    background: rgba(0,0,0,0.25);
+    background: rgba($primary-color, 0.25);
+    z-index: 1;
   }
 
   .drag-reminder.top {

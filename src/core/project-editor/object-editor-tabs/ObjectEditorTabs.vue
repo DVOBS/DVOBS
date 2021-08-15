@@ -208,6 +208,10 @@ export default class ObjectEditorTabs extends Vue {
   public getEditor(obj: EditableObject) {
     return getEditorInfo(obj).editor
   }
+
+  public created() {
+    // debugger
+  }
 }
 </script>
 <style scoped lang="scss">
@@ -218,19 +222,14 @@ export default class ObjectEditorTabs extends Vue {
   .tabs {
     width: 100%;
     height: $panel-header-height;
+    background: $panel-background-header-color;
     white-space: nowrap;
     overflow-y: hidden;
     overflow-x: auto;
-    border-left: solid 1px $border-color;
-    border-right: solid 1px $border-color;
   }
   .editor-container {
     height: calc(100% - #{$panel-header-height});
     background: $panel-background-color;
-    border-left: solid 1px $border-color;
-    border-right: solid 1px $border-color;
-    border-bottom: solid 1px $border-color;
-    box-shadow: 0px -1px 0px 0px $border-color;
   }
   .tips {
     text-align: center;

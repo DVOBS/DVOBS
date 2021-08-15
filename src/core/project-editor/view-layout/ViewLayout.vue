@@ -41,8 +41,10 @@ export default class ViewLayout extends Vue {
   public rootNode = defaultLayout
 
   public handleDrop() {
-    this.dragTab = ''
-    this.dragTabs = null
+    setTimeout(() => {
+      this.dragTab = ''
+      this.dragTabs = null
+    }, 0);
   }
 }
 </script>

@@ -36,12 +36,12 @@ export const defaultLayout: HorizontalLayoutNode = {
       children: [
         {
           type: 'main',
-          basis: 70,
+          basis: 75,
           name: 'object-eidtor-tabs'
         }, {
           type: 'tabs',
           basis: 25,
-          children: []
+          children: ['console']
         }
       ]
     }, {

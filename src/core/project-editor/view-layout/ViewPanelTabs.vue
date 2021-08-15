@@ -8,15 +8,15 @@
         @add="handleAdd"
       >
         <div
-          v-for="(tab, index) in innerTabs"
+          v-for="(tab) in innerTabs"
           :key="tab"
           class="tab"
           :class="{
-            active: activeIndex === index
+            active: activeTab === tab
           }"
           draggable="true"
           @dragstart="handleDragstart(tab)"
-          @click="activeIndex = index"
+          @click="activeTab = tab"
         >{{getViewinfoLabel(tab)}}</div>
       </vue-drag>
     </div>
@@ -60,24 +60,33 @@
         /> -->
       </svg>
       <div class="drag-reminder" :class="dragPostion"></div>
-      <portal-target
+      <!-- <portal-target
         class="portal-target"
-        v-for="(tab, index) in innerTabs"
-        v-show="activeIndex === index"
+        v-for="tab in innerTabs"
+        v-show="activeTab === tab"
         :key="tab"
         :name="tab"
-      ></portal-target>
+      ></portal-target> -->
+      <CrossRenderView
+        class="portal-target"
+        v-for="tab in innerTabs"
+        v-show="activeTab === tab"
+        :key="tab"
+        :name="tab"
+      ></CrossRenderView>
     </div>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Ref, Inject, ModelSync, Watch } from 'vue-property-decorator'
-import ViewLayout from './ViewLayout.vue'
 import draggable from "vuedraggable"
+import ViewLayout from './ViewLayout.vue'
+import CrossRenderView from '@/core/common/cross-render/CrossRenderView.vue'
 
 @Component({
   components: {
     'vue-drag': draggable,
+    CrossRenderView
   }
 })
 export default class ViewPanelTabs extends Vue {
@@ -111,7 +120,16 @@ export default class ViewPanelTabs extends Vue {
     return this.getViewinfo(key)?.label || ''
   }
 
-  public activeIndex = 0
+  public activeTab = ''
+
+  @Watch('activeTab')
+  @Watch('innerTabs',{ immediate: true })
+  public activeTabCheck() {
+    if (this.innerTabs.indexOf(this.activeTab) !== -1) {
+      return
+    }
+    this.activeTab = this.innerTabs[0] || ''
+  }
 
   public handleWhell(event: WheelEvent) {
     const dy = event.deltaY / 5
@@ -140,7 +158,7 @@ export default class ViewPanelTabs extends Vue {
   }
 
   public handleAdd() {
-    console.log('1')
+    this.activeTab = this.layout.dragTab
     this.layout.dragTabs = this
   }
 
@@ -217,7 +235,8 @@ export default class ViewPanelTabs extends Vue {
 
   .drag-reminder {
     position: absolute;
-    background: rgba(0,0,0,0.25);
+    background: rgba($primary-color, 0.25);
+    z-index: 1;
   }
 
   .drag-reminder.top {

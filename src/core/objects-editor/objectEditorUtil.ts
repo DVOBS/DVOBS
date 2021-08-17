@@ -1,5 +1,6 @@
 import EditableObject from "@/core/model/EditableObject";
 import ProjectFile from "@/core/model/ProjectFile";
+import DataScreenFileEditor from '@/core/objects-editor/data-screen-file-editor/DataScreenFileEditor.vue'
 import ImageEditor from '@/core/objects-editor/image-file-editor/ImageEditor.vue'
 import FileEditor from '@/core/objects-editor/file-editor/FileEditor.vue'
 
@@ -12,10 +13,10 @@ const allEditorInfos = [
     icon: ['far', 'file-image'],
     color: '#30f8f4'
   }, {
-    name: 'Vue 文件',
+    name: '数据大屏',
     constructor: ProjectFile,
-    editor: FileEditor,
-    fileSuffix: 'vue',
+    editor: DataScreenFileEditor,
+    fileSuffix: 'data-screen.vue',
     icon: ['fab', 'vuejs'],
     color: '#3fb884'
   }

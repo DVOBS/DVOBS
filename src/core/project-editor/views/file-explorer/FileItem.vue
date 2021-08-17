@@ -114,7 +114,7 @@ export default class FileItem extends Vue {
   line-height: 26px;
   color: #babaca;
   cursor: pointer;
-  padding: 0 10px;
+  padding: 0 7px;
   &.fade {
     opacity: 0.25;
   }

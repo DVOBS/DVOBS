@@ -17,6 +17,9 @@ export default class MeunItem extends Vue {
   public disable!: boolean
 
   public handelClick() {
+    if (this.disable) {
+      return
+    }
     this.$emit('click')
     this.projectEditor.closeContextMenu()
   }

@@ -4,9 +4,9 @@ import sharedVnodesContainer from './sharedVnodesContainer'
 @Component
 export default class CrossRender extends Vue {
   @Prop({ required: true })
-  private name!: string;
+  public name!: string;
 
-  private render(createElement: Vue.CreateElement) {
+  public render(createElement: Vue.CreateElement) {
     const defaultSoltNodes = this.$slots.default || []
     for (const defaultSoltNode of defaultSoltNodes) {
       defaultSoltNode.data = defaultSoltNode.data || {}
@@ -18,7 +18,7 @@ export default class CrossRender extends Vue {
     return createElement('div', { style: { display: 'none' }} ,this.$slots.default)
   }
 
-  private beforeDestroy() {
+  public beforeDestroy() {
     Vue.delete(sharedVnodesContainer.vnodes, this.name)
   }
 }

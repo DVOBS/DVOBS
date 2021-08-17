@@ -160,6 +160,10 @@ export default class ViewPanelTabs extends Vue {
   public handleAdd() {
     this.activeTab = this.layout.dragTab
     this.layout.dragTabs = this
+    setTimeout(() => {
+      this.activeTab = ''
+      this.layout.dragTabs = null
+    }, 100);
   }
 
   public removeTab(tab: string) {
@@ -181,7 +185,7 @@ export default class ViewPanelTabs extends Vue {
 
   .tabs {
     height: $panel-header-height;
-    background: $panel-background-header-color;
+    background: $panel-background-dark-color;
     white-space: nowrap;
     overflow-y: hidden;
     overflow-x: auto;
@@ -217,7 +221,7 @@ export default class ViewPanelTabs extends Vue {
     width: 100%;
     height: calc(100% - #{$panel-header-height});
     background: $panel-background-color;
-    box-shadow: 0px -1px 0px 0px #181818;
+    // box-shadow: 0px -1px 0px 0px #181818;
   }
 
   .drag-area {
@@ -230,13 +234,13 @@ export default class ViewPanelTabs extends Vue {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.25);
-    z-index: 10;
+    z-index: 31;
   }
 
   .drag-reminder {
     position: absolute;
     background: rgba($primary-color, 0.25);
-    z-index: 1;
+    z-index: 30;
   }
 
   .drag-reminder.top {

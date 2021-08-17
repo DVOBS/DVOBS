@@ -1,8 +1,6 @@
 <template>
   <div class="CodeEditor">
-    <div class="vue-codemirror">
-      <textarea ref="textarea"></textarea>
-    </div>
+    <textarea ref="textarea"></textarea>
   </div>
 </template>
 <script lang="ts">
@@ -79,6 +77,7 @@ export default class CodeEditor extends Vue {
 @import '~@/assets/style/variables.scss';
 .CodeEditor {
   height: 100%;
+  overflow: hidden;
   ::v-deep {
     div.CodeMirror-selected { background: rgba(255,255,255,0.3) !important;}
   }

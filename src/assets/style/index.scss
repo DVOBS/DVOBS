@@ -1,3 +1,5 @@
+@import './variables.scss';
+
 *,
 *::before,
 *::after {
@@ -12,8 +14,8 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.25);
-  border-radius: 2px;
+  background: rgba($primary-color,0.5);
+  border-radius: 1px;
 }
 
 *::-webkit-scrollbar-track {
@@ -22,4 +24,288 @@
 
 *::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+
+/* ElementUI 样式重置 */
+body {
+  .el-button {
+    border-radius: 0px;
+  }
+
+  @mixin button($bg-color) {
+    &,
+    &:focus {
+      background: $bg-color;
+      border-color: $bg-color;
+      color: $text-color;
+    }
+    &:hover {
+      background: lighten($bg-color, 12.5%) !important;
+      border-color: lighten($bg-color, 12.5%) !important;
+    }
+    &:active {
+      background: lighten($bg-color, 7.5%) !important;
+      border-color: lighten($bg-color, 7.5%) !important;
+    }
+  }
+
+  .el-button--default {
+    @include button($button-background)
+  }
+
+  .el-button--default.el-button--primary {
+    @include button($primary-color)
+  }
+  // .el-button--default,
+  // .el-button--default:focus {
+  //   background: $button-background;
+  //   border-color: $button-background;
+  //   color: $text-color;
+  // }
+
+  // .el-button--default:hover {
+  //   background: lighten($button-background, 12.5%) !important;
+  //   border-color: lighten($button-background, 12.5%) !important;
+  // }
+
+  // .el-button--default:active {
+  //   background: lighten($button-background, 7.5%) !important;
+  //   border-color: lighten($button-background, 7.5%) !important;
+  // }
+
+  .el-button.el-button--mini {
+    height: 24px;
+    padding: 0px 10px;
+    line-height: 24px;
+  }
+
+}
+
+/* el-input */
+body {
+  .el-input__inner {
+    background:$input-background-color;
+    color: $text-color;
+    border-color: $input-border-color;
+    border-radius: 0px;
+  }
+
+  .el-input__inner:hover {
+    border-color: $primary-color;
+  }
+
+  .el-input.is-disabled .el-input__inner {
+    background:$input-background-color;
+    color: $text-color;
+    border-color:$input-background-color;
+    border-radius: 0px;
+  }
+
+  .el-input.el-input--mini.is-disabled {
+    opacity: 0.5;
+  }
+
+  .el-input--mini .el-input__icon {
+    line-height: 24px;
+    color: $text-color;
+  }
+
+  .el-input--mini .el-input__inner {
+    height: 24px;
+    line-height: 22px;
+    text-align: left;
+    padding-left: 5px;
+    &::-webkit-input-placeholder {
+      position: relative;
+      top: 1px;
+      color: $text-color-gray;
+    }
+  }
+
+  .el-input--prefix .el-input__inner {
+    padding-left: 30px;
+  }
+
+  .el-input-number--mini {
+    height: 24px;
+    line-height: 22px;
+  }
+
+  .el-input-number.is-controls-right .el-input__inner {
+    padding-left: 5px;
+  }
+
+  .el-input-number.is-controls-right .el-input-number__decrease,
+  .el-input-number.is-controls-right .el-input-number__increase {
+    height: 50%;
+    background: transparent;
+    border: none;
+    border-left: solid 1px $input-border-color;
+    color: $text-color-gray;
+  }
+}
+
+/* 下拉选择 */
+body {
+  .el-select {
+    width: 100%;
+  }
+
+  .el-select-dropdown {
+    background: $input-background-color;
+    border-color: $input-border-color;
+    box-shadow: 2px 2px 5px #333333;
+  }
+
+  .el-select-dropdown__item {
+    color: $text-color;
+    font-size: 12px;
+    padding-left: 15px;
+    height: 24px;
+    line-height: 24px;
+  }
+
+  .el-select-dropdown__item.selected {
+    color: $primary-color;
+  }
+
+  .el-select-dropdown__item.hover,
+  .el-select-dropdown__item:hover {
+    background: inherit;
+    background: lighten($input-background-color, 20%);
+  }
+
+  .el-popper .popper__arrow {
+    left: 15px !important;
+    top: -7px;
+  }
+
+  .el-popper .popper__arrow {
+    border-bottom-color: $input-border-color !important;
+  }
+  
+  .el-popper .popper__arrow::after {
+    border-bottom-color: $input-background-color !important;
+  }
+
+  .el-select:hover .el-input__inner {
+    border-color: $primary-color;
+  }
+}
+
+/* 颜色输入框 */
+body {
+  .el-color-picker {
+    vertical-align: middle;
+  }
+
+  .el-color-dropdown__value {
+    line-height: 24px;
+  }
+
+  .el-color-picker__trigger {
+    border-color: $input-border-color;
+    padding: 1px;
+  }
+
+  .el-color-picker--mini .el-color-picker__trigger {
+    height: 24px;
+    width: 24px;
+    border-radius: 0;
+  }
+
+  .el-color-picker__color {
+    border: none;
+  }
+
+  .el-color-picker__color {
+    border-color: $input-border-color;
+  }
+
+  .el-color-picker__panel {
+    background-color: #252525;
+    border: 1px solid #444444;
+    box-shadow: 1px 1px 4px 0px black;
+  }
+}
+
+/* el-collapse */
+body {
+  .el-collapse {
+    border: none;
+  }
+  .el-collapse-item__header {
+    height: $header-height;
+    line-height: $header-height;
+    padding-left: 15px;
+    background: $panel-background-color;
+    border: none;
+    color: $text-color !important;
+    font-weight: bold;
+    font-size: inherit;
+    letter-spacing: 2px;
+  }
+  .el-collapse-item__wrap,
+  .el-collapse-item__content {
+    background: transparent;
+    border: none;
+  }
+  .el-collapse-item__content {
+    padding: 5px 0 5px 15px;
+    color: $text-color;
+  }
+}
+
+/* el-message-box */
+body {
+  .el-message-box {
+    background: $panel-background-color;
+    border-color: $border-color;
+  }
+  .el-message-box__title,
+  .el-message-box__message {
+    color: $text-color;
+  }
+}
+
+/* el-message-box */
+body {
+  .el-collapse {
+    border: none;
+  }
+
+  .el-collapse-item__header {
+    position: relative;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 0 0 10px;
+    background: transparent;
+    padding-left: 24px;
+    border: none;
+    color: $text-color-gray;
+    font-size: 12px;
+  }
+
+  .el-collapse-item__arrow {
+    position: absolute;
+    font-size: 12px;
+    left: 6px;
+    top: 10px;
+    color: rgb(192,196,204);
+  }
+
+  .el-collapse-item__wrap {
+    background: transparent;
+    border: none;
+  }
+
+  .el-collapse-item__content {
+    color: inherit;
+    padding: 0 0 0;
+  }
+
+  .el-collapse-item__arrow {
+    margin: 0 11px 0 auto;
+  }
 }

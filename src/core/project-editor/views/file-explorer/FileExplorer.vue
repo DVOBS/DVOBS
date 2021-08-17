@@ -1,10 +1,13 @@
 <template>
   <div class="FileExplorer">
-    <DirectoryItem
-      :directory="rootDirectory"
-      :root="true"
-      :selected="selected">
-    </DirectoryItem>
+    <div class="body">
+      <DirectoryItem
+        class="root-directory"
+        :directory="rootDirectory"
+        :root="true"
+        :selected="selected">
+      </DirectoryItem>
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -45,6 +48,12 @@ export default class FileExplorer extends Vue {
 .FileExplorer {
   widows: 100%;
   height: 100%;
-  padding: 5px 0px;
+  padding: 3px;
+  background: $panel-background-color;
+  .body {
+    height: 100%;
+    padding: 0;
+    background: $panel-background-dark-color;
+  }
 }
 </style>

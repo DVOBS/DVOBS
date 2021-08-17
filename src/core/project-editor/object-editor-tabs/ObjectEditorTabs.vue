@@ -222,7 +222,7 @@ export default class ObjectEditorTabs extends Vue {
   .tabs {
     width: 100%;
     height: $panel-header-height;
-    background: $panel-background-header-color;
+    background: $panel-background-dark-color;
     white-space: nowrap;
     overflow-y: hidden;
     overflow-x: auto;

@@ -10,10 +10,11 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Provide } from 'vue-property-decorator'
+import { Component, Vue, Provide, Watch } from 'vue-property-decorator'
+import localforage from 'localforage'
+import { defaultLayout, HorizontalLayoutNode } from './layout'
 import ViewPanelTabs from './ViewPanelTabs.vue'
 import HorizontalContainer from './HorizontalContainer.vue'
-import { defaultLayout } from './layout'
 
 interface viewinfo {
   name: string,
@@ -40,11 +41,23 @@ export default class ViewLayout extends Vue {
 
   public rootNode = defaultLayout
 
+  @Watch('rootNode', { deep: true })
+  public rootNodeChange() {
+    localforage.setItem('layout', this.rootNode)
+  }
+
   public handleDrop() {
     setTimeout(() => {
       this.dragTab = ''
       this.dragTabs = null
     }, 0);
+  }
+
+  public async mounted() {
+    const layout = await localforage.getItem('layout')
+    if (layout) {
+      this.rootNode = layout as HorizontalLayoutNode
+    }
   }
 }
 </script>

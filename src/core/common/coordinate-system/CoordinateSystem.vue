@@ -29,7 +29,7 @@ import { addListener, removeListener } from 'resize-detector'
 
 @Component
 export default class CoordinateSystem extends Vue {
-  @Provide('main-coordinate-system')
+  @Provide('coordinate-system')
   get CoordinateSystem (): CoordinateSystem {
     return this
   }
@@ -58,7 +58,7 @@ export default class CoordinateSystem extends Vue {
   @Prop({ type: Number, default: 12 })
   public textFontSize!: number
 
-  @Prop({ required: false, default: '#252525'})
+  @Prop({ required: false, default: '#212121'})
   public bgColor!: string
 
   @Prop({ required: false, default: '#ffffff'})
@@ -84,6 +84,7 @@ export default class CoordinateSystem extends Vue {
 
   public draging = false
   public initialState: any = null;
+  public controllers: any[] = []
 
   get xAxisStyle () {
     return {
@@ -422,7 +423,7 @@ export default class CoordinateSystem extends Vue {
 }
 </script>
 <style scoped lang="scss">
-$background-color: #252525;
+$background-color: #212121;
 
 .main-coordinate-system {
   position: relative;

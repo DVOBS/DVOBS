@@ -110,13 +110,13 @@ export default class MainContainer extends Vue {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.25);
-    z-index: 10;
+    z-index: 31;
   }
 
   .drag-reminder {
     position: absolute;
     background: rgba($primary-color, 0.25);
-    z-index: 1;
+    z-index: 30;
   }
 
   .drag-reminder.top {

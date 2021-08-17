@@ -105,7 +105,6 @@ export default class CreateNew extends Vue {
 <style scoped lang="scss">
 @import '~@/assets/style/variables.scss';
 $folderColor: #90a4ae;
-
 .CreateNew {
   position: relative;
   width: 100%;
@@ -117,7 +116,7 @@ $folderColor: #90a4ae;
     height: 10px;
     margin-top: 6px;
     margin-right: 5px;
-    margin-left: 10px;
+    margin-left: 7px;
     color: rgba(255,255,255,0.5);
     opacity: 0.5;
   }
@@ -137,7 +136,7 @@ $folderColor: #90a4ae;
     top: 0px;
     width: 10px;
     height: 16px;
-    margin-left: 27px;
+    margin-left: 24px;
     margin-right: 11px;
     margin-top: 5px;
     vertical-align: super;

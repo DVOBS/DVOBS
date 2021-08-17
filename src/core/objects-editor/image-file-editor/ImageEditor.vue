@@ -169,9 +169,11 @@ export default class ImageEditor extends Vue {
   font-size: 12px;
   height: 100%;
   padding: 0px;
+  background: $panel-background-color;
+  padding: 3px;
   .body {
     height: 100%;
-    line-height: calc(100%);
+    line-height: 100%;
     background: $panel-background-color;
     display: flex;
     align-items:center;

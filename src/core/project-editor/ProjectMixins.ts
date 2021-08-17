@@ -1,6 +1,6 @@
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Ref, Vue, Watch } from 'vue-property-decorator'
 
-import Jszip from 'jszip'
+import Jszip, { files } from 'jszip'
 import axios from 'axios'
 import throttle from 'lodash.throttle'
 import localforage from 'localforage'
@@ -12,7 +12,28 @@ import { JsonConvert } from 'json2typescript'
 
 @Component
 export default class ProjectMixins extends Vue {
+  @Ref()
+  public fileInput !: HTMLInputElement
+
   public project: Project | null = null
+
+  public get allProjectFile() {
+    const map = new Map<string, ProjectFile>()
+    
+    const  traverse = (directory: ProjectDirectory, parentPath: string) => {
+      for (const subDirectory of directory.directorys) {
+        traverse(subDirectory, parentPath + subDirectory.name + '/')
+      }
+      for (const file of directory.files) {
+        map.set(parentPath + file.name, file)
+      }
+    }
+    if (this.project) {
+      traverse(this.project.rootDirectory, '')
+    }
+
+    return map
+  }
 
   @Watch('project', { deep: true })
   public async projectChange(project: Project) {
@@ -23,7 +44,30 @@ export default class ProjectMixins extends Vue {
     localforage.setItem('project', project)
   }, 100)
 
-  public getDefaultProject() {
+  /** 上传项目文件 */
+  public uploadProjectFile() {
+    this.fileInput.value = ''
+    this.fileInput.click()
+  }
+
+  /** 上传项目文件回调 */
+  public handleFileInputChange() {
+    const fileInput = this.fileInput
+    if (
+      fileInput.files &&
+      fileInput.files.length
+    ) {
+      try {
+        const file = fileInput.files[0]
+        this.importProjectZipFile(file)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
+  /** 新建项目 */
+  public createNewProject() {
     axios({
       method: 'get',
       url: './ProjectExamples.zip',
@@ -97,7 +141,7 @@ export default class ProjectMixins extends Vue {
       if (projectPlainObject) {
         this.project = new JsonConvert().deserializeObject(projectPlainObject, Project)
       } else {
-        this.getDefaultProject()
+        this.createNewProject()
       }
     }
   }

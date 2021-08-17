@@ -41,17 +41,18 @@ export default class FileEditor extends Vue {
 .FileEditor {
   font-size: 12px;
   height: 100%;
-  padding: 2px;
+  padding: 3px;
+  background: $panel-background-color;
   .body {
     height: 100%;
-    background: $panel-background-color;
+    background: $panel-background-dark-color;
   }
   .code-editor {
     height: 100%;
   }
   ::v-deep .CodeMirror,
   ::v-deep .CodeMirror-gutters {
-    background: $panel-background-color;
+    background: $panel-background-dark-color;
   }
 }
 </style>

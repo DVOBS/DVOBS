@@ -212,7 +212,7 @@ $folderColor: #90a4ae;
   }
   .directory {
     position: relative;
-    padding: 0 10px;
+    padding: 0 7px;
     height: 26px;
     line-height: 26px;
     color: #babaca;

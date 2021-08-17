@@ -4,13 +4,13 @@ import sharedVnodesContainer from './sharedVnodesContainer'
 @Component
 export default class CrossRenderView extends Vue {
   @Prop({ required: true })
-  private name!: string;
+  public name!: string;
 
-  private get sharedVnodesContainer() {
+  public get sharedVnodesContainer() {
     return sharedVnodesContainer
   }
 
-  private render(createElement: Vue.CreateElement) {
+  public render(createElement: Vue.CreateElement) {
     const result = createElement('div', { style: {
       height: '100%'
     } })
@@ -19,7 +19,7 @@ export default class CrossRenderView extends Vue {
 
   @Watch('name')
   @Watch('sharedVnodesContainer', { deep: true })
-  private addEl() {
+  public addEl() {
     const vnode = sharedVnodesContainer.vnodes[this.name]
     const el = vnode?.componentInstance?.$el || vnode?.elm
     if (el) {
@@ -27,11 +27,11 @@ export default class CrossRenderView extends Vue {
     }
   }
 
-  private mounted() {
+  public mounted() {
     this.addEl()
   }
 
-  private beforeDestroy() {
+  public beforeDestroy() {
     // DO NOTHING
   }
 }

@@ -10,33 +10,39 @@
       <span class="menu-item">
         <span>项目(P)</span>
         <div class="sub-menu">
-          <span>新建</span>
-          <span>导入</span>
+          <span
+            @click="projectEditor.createNewProject"
+          >新建</span>
+          <span
+            @click="projectEditor.uploadProjectFile"
+          >导入</span>
           <span>导出</span>
           <span>设置</span>
         </div>
       </span>
-      <span class="menu-item">
+      <span class="menu-item disable">
         <span>查看(V)</span>
       </span>
-      <span class="menu-item">
+      <span class="menu-item disable">
         <span>运行(R)</span>
       </span>
-      <span class="menu-item">
+      <span class="menu-item disable">
         <span>设置(R)</span>
       </span>
-      <span class="menu-item">
+      <span class="menu-item disable">
        <span> 帮助(H)</span>
       </span>
     </span>
-    <input type="file" ref="fileInput" accept="application/x-zip-compressed" v-show="false">
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Inject } from 'vue-property-decorator'
+import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
 
 @Component
 export default class ProjectEditorHeader extends Vue {
+  @Inject('projectEditor')
+  public projectEditor!: ProjectEditor
 }
 </script>
 <style scoped lang="scss">
@@ -70,9 +76,18 @@ export default class ProjectEditorHeader extends Vue {
       padding: 0 15px;
       cursor: pointer;
     }
+    .menu-item.disable {
+      // pointer-events: none;
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     .menu-item:hover {
       background: lighten($panel-background-color, 5%);
       box-shadow: 0px 1px 2px #000;
+    }
+    .menu-item.disable:hover {
+      background: transparent;
+      box-shadow: none;
     }
     .sub-menu {
       display: none;
@@ -85,6 +100,9 @@ export default class ProjectEditorHeader extends Vue {
     .menu-item:hover .sub-menu {
       display: block;
       box-shadow: 0px 1px 2px #000;
+    }
+    .menu-item.disable:hover .sub-menu {
+      display: none;
     }
     .sub-menu span {
       display: block;

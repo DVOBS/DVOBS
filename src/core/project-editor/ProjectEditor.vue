@@ -29,19 +29,13 @@
         label="层级管理器"
         name="hierarchy"
       >
-        <p>层级</p>
+        <HierarchyInspector></HierarchyInspector>
       </ViewPanel>
       <ViewPanel
         label="属性查看器"
         name="property-inspector"
       >
-        <p>属性查看器</p>
-      </ViewPanel>
-      <ViewPanel
-        label="数据查看器"
-        name="data-inspector"
-      >
-        <p>数据查看器</p>
+        <PropertyInspector></PropertyInspector>
       </ViewPanel>
       <ViewPanel
         label="数据查看器"
@@ -71,7 +65,13 @@
         @click.native.stop
       ></portal-target>
     </div>
-    <input type="file" ref="fileInput" accept="application/x-zip-compressed" v-show="false">
+    <input
+      v-show="false"
+      type="file"
+      ref="fileInput"
+      accept="application/x-zip-compressed"
+      @change="handleFileInputChange"
+    >
   </div>
 </template>
 <script lang="ts">
@@ -82,8 +82,11 @@ import ContextMenuMixins from './ContextMenuMixins'
 import ViewLayout from './view-layout/ViewLayout.vue'
 import ViewPanel from './view-layout/ViewPanel.vue'
 
-import FileExplorer from '@/core/project-editor/views/file-explorer/FileExplorer.vue'
 import ObjectEditorTabs from '@/core/project-editor/object-editor-tabs/ObjectEditorTabs.vue'
+import FileExplorer from '@/core/project-editor/views/file-explorer/FileExplorer.vue'
+import PropertyInspector from '@/core/project-editor/views/property-inspector/PropertyInspector.vue'
+import HierarchyInspector from '@/core/project-editor/views/hierarchy-inspector/HierarchyInspector.vue'
+
 import EditableObject from '@/core/model/EditableObject'
 
 @Component({
@@ -92,7 +95,9 @@ import EditableObject from '@/core/model/EditableObject'
     ObjectEditorTabs,
     ViewLayout,
     ViewPanel,
-    FileExplorer
+    FileExplorer,
+    PropertyInspector,
+    HierarchyInspector
   }
 })
 export default class ProjectEditor extends Mixins(ProjectMixins, ContextMenuMixins) {

@@ -29,5 +29,8 @@ export default class HierarchyInspector extends Vue {
 @import '~@/assets/style/variables.scss';
 .HierarchyInspector {
   height: 100%;
+  .messgae {
+    padding: 10px;
+  }
 }
 </style>

@@ -23,7 +23,7 @@
         label="控件库"
         name="widget-library"
       >
-        <p>组件库</p>
+        <WidgetLibrary></WidgetLibrary>
       </ViewPanel>
       <ViewPanel
         label="层级管理器"
@@ -57,6 +57,7 @@
     >
       <portal-target
         class="menu-portal-target"
+        ref="contextMenu"
         :style="{
           top: contextMenuY + 'px',
           left: contextMenuX + 'px'
@@ -86,6 +87,7 @@ import ObjectEditorTabs from '@/core/project-editor/object-editor-tabs/ObjectEdi
 import FileExplorer from '@/core/project-editor/views/file-explorer/FileExplorer.vue'
 import PropertyInspector from '@/core/project-editor/views/property-inspector/PropertyInspector.vue'
 import HierarchyInspector from '@/core/project-editor/views/hierarchy-inspector/HierarchyInspector.vue'
+import WidgetLibrary from '@/core/project-editor/views/widget-library/WidgetLibrary.vue'
 
 import EditableObject from '@/core/model/EditableObject'
 
@@ -97,7 +99,8 @@ import EditableObject from '@/core/model/EditableObject'
     ViewPanel,
     FileExplorer,
     PropertyInspector,
-    HierarchyInspector
+    HierarchyInspector,
+    WidgetLibrary
   }
 })
 export default class ProjectEditor extends Mixins(ProjectMixins, ContextMenuMixins) {

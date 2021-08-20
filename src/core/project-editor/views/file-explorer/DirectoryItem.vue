@@ -44,21 +44,28 @@
         :key="item.name"
       ></FileItem>
     </div>
+    <input
+      v-show="false"
+      ref="uploadFileInput"
+      type="file"
+      @change="handleFileInputChange"
+    >
     <ContextMenu ref="contextMenu">
       <MeunItem label="新建文件" @click="openCrfeateNew('file')"></MeunItem>
+      <MeunItem label="上传文件" @click="uploadFile"></MeunItem>
       <MeunItem label="新建文件夹" @click="openCrfeateNew('directory')"></MeunItem>
       <MeunItem label="文件夹内查找"></MeunItem>
       <MeunItem label="复制路径"></MeunItem>
       <MeunItemSplitLine></MeunItemSplitLine>
       <MeunItem label="重命名" @click="nameEditor.startInput()"></MeunItem>
-      <MeunItem label="删除"></MeunItem>
+      <MeunItem label="删除" @click="remove"></MeunItem>
     </ContextMenu>
   </div>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue, Inject, Ref } from 'vue-property-decorator'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-// import { MessageBox } from 'element-ui'
+import { MessageBox } from 'element-ui'
 import ProjectDirectory from '@/core/model/ProjectDirectory'
 import ProjectFile from '@/core/model/ProjectFile'
 import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
@@ -94,6 +101,9 @@ export default class DirectoryItem extends Vue {
 
   @Ref()
   public contextMenu! :ContextMenu
+
+  @Ref()
+  public uploadFileInput !: HTMLInputElement
 
   @Prop()
   public directory!: ProjectDirectory
@@ -133,43 +143,42 @@ export default class DirectoryItem extends Vue {
 
   public handleContextmenu(event: MouseEvent) {
     this.contextMenu.open(event.clientX, event.clientY)
-    // const meunItems = [{
-    //     name: '新建文件',
-    //     handler: () => { this.openCrfeateNew('file') }
-    //   }, {
-    //     name: '新建文件夹',
-    //     handler: () => { this.openCrfeateNew('directory') }
-    //   }, {
-    //     name: 'split-line'
-    //   }, {
-    //     name: '文件夹内查找',
-    //     handler: () => { /*  */}
-    //   }, {
-    //     name: '复制路径',
-    //     handler: () => { /*  */}
-    //   }
-    // ]
+  }
 
-    // if (!this.root) {
-    //   meunItems.push({
-    //     name: 'split-line'
-    //   }, {
-    //     name: '重命名',
-    //     handler: () => {
-    //       // this.nameEditor.startInput()
-    //     }
-    //   }, {
-    //     name: '删除',
-    //     handler: async () => {
-    //       try {
-    //         await MessageBox.confirm(`是否删除文件 ${this.directory.name} ！`, '警告')
-    //         this.remove()
-    //       } catch (error) {/*  */}
-    //     }
-    //   })
-    // }
+  public uploadFile() {
+    this.uploadFileInput.value = ''
+    this.uploadFileInput.click()
+  }
 
-    // this.appEditor.openContextmenu(event, meunItems)
+  public handleFileInputChange() {
+    const fileInput = this.uploadFileInput
+    if (
+      fileInput.files &&
+      fileInput.files.length
+    ) {
+      try {
+        const file = fileInput.files[0]
+        var reader = new FileReader()
+        reader.onload = () => {
+          const projectFile = new ProjectFile()
+          projectFile.name = file.name
+          const result = reader.result?.toString() || ''
+          const array = result.split(',')
+          if (array.length === 2) {
+            projectFile.base64 = array[1]
+          } else {
+            projectFile.base64 = result
+          }
+
+          if (this.directory.files.findIndex((d) => d.name === file.name) === -1) {
+            this.directory.files.push(projectFile)
+          }
+        }
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.log(error)
+      }
+    }
   }
 
   public blur () {
@@ -190,13 +199,16 @@ export default class DirectoryItem extends Vue {
     })
   }
 
-  public remove() {
-    const parent = this.$parent as DirectoryItem
-    const directorys = parent.directory.directorys
-    const index = directorys.indexOf(this.directory)
-    if (index >= 0) {
-      directorys.splice(index, 1);
-    }
+  public async remove() {
+    try {
+      await MessageBox.confirm(`是否删除文件 ${this.directory.name} ！`, '警告')
+      const parent = this.$parent as DirectoryItem
+      const directorys = parent.directory.directorys
+      const index = directorys.indexOf(this.directory)
+      if (index >= 0) {
+        directorys.splice(index, 1);
+      }
+    } catch (error) {/*  */}
   }
 }
 </script>

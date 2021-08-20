@@ -16,8 +16,10 @@
           <span
             @click="projectEditor.uploadProjectFile"
           >导入</span>
-          <span>导出</span>
-          <span>设置</span>
+          <span
+            @click="projectEditor.donwloadProjectFile"
+          >导出</span>
+          <span class="disable">设置</span>
         </div>
       </span>
       <span class="menu-item disable">
@@ -110,6 +112,12 @@ export default class ProjectEditorHeader extends Vue {
     }
     .sub-menu span:hover {
       background: rgba(0, 0, 0, 0.25);
+    }
+    .sub-menu span.disable {
+      cursor: not-allowed;
+    }
+    .sub-menu span.disable:hover {
+      background: none;
     }
   }
 }

@@ -19,23 +19,35 @@
       v-model="file.name"
     ></NameEditor>
     <div class="background"></div>
+    <ContextMenu ref="contextMenu">
+      <MeunItem label="重命名" @click="nameEditor.startInput()"></MeunItem>
+      <MeunItem label="删除" @click="remove"></MeunItem>
+    </ContextMenu>
   </div>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue, Inject, Ref } from 'vue-property-decorator'
+import { MessageBox } from 'element-ui'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { getEditorInfo } from '@/core/objects-editor/objectEditorUtil'
 import ProjectDirectory from '@/core/model/ProjectDirectory'
 import ProjectFile from '@/core/model/ProjectFile'
 import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
+import ContextMenu from '@/core/project-editor/context-menu/ContextMenu.vue'
+import MeunItem from '@/core/project-editor/context-menu/MeunItem.vue'
+import MeunItemSplitLine from '@/core/project-editor/context-menu/MeunItemSplitLine.vue'
 import NameEditor from './NameEditor.vue'
 import DirectoryItem from './DirectoryItem.vue'
 import FileExplorer from './FileExplorer.vue'
 
+
 @Component({
   components: {
     FontAwesomeIcon,
-    NameEditor
+    NameEditor,
+    ContextMenu,
+    MeunItem,
+    MeunItemSplitLine
   }
 })
 export default class FileItem extends Vue {
@@ -44,6 +56,9 @@ export default class FileItem extends Vue {
 
   @Inject('fileExplorer')
   public fileExplorer!: FileExplorer
+
+  @Ref()
+  public contextMenu! :ContextMenu
 
   @Ref()
   public nameEditor!: NameEditor
@@ -85,7 +100,7 @@ export default class FileItem extends Vue {
   }
 
   public handleContextmenu(event: MouseEvent) {
-    console.log(event)
+    this.contextMenu.open(event.clientX, event.clientY)
   }
 
   public handleClick() {
@@ -96,13 +111,16 @@ export default class FileItem extends Vue {
     this.projectEditor.openObjectEditor(this.file)
   }
 
-  public remove() {
-    const parent = this.$parent as DirectoryItem
-    const directorys = parent.directory.files
-    const index = directorys.indexOf(this.file)
-    if (index >= 0) {
-      directorys.splice(index, 1);
-    }
+  public async remove() {
+    try {
+      await MessageBox.confirm(`是否删除文件 ${this.file.name} ！`, '警告')
+      const parent = this.$parent as DirectoryItem
+      const directorys = parent.directory.files
+      const index = directorys.indexOf(this.file)
+      if (index >= 0) {
+        directorys.splice(index, 1);
+      }
+    } catch (error) {/*  */}
   }
 }
 </script>

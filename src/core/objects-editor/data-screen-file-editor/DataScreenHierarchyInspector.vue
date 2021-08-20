@@ -1,5 +1,8 @@
 <template>
-  <div class="DataScreenHierarchyInspector">
+  <div
+    class="DataScreenHierarchyInspector"
+    @contextmenu.prevent="dataScreenFileEditor.handleContextmenu"
+  >
     <DataScreenHierarchyNode
       v-for="(widgetConfig, index) in widgetConfigs"
       :class="index === 0 ? 'first-node' : ''"
@@ -23,12 +26,12 @@ export default class DataScreenHierarchyInspector extends Vue {
   @Inject('projectEditor')
   public projectEditor!: ProjectEditor
 
-  public get currentObjectEditor() {
+  public get dataScreenFileEditor() {
     return this.projectEditor.currentObjectEditor as DataScreenFileEditor
   }
 
   public get dataScreenConfig() {
-    return this.currentObjectEditor.dataScreenConfig
+    return this.dataScreenFileEditor.dataScreenConfig
   }
 
   public get widgetConfigs() {

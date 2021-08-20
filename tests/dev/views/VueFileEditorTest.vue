@@ -9,6 +9,6 @@ export default class VueFileEditorTest extends Vue {
 </script>
 <style scoped lang="scss">
 .VueFileEditorTest {
-  background: red;
+  background: rgba(0,0,0,0.25);
 }
 </style>

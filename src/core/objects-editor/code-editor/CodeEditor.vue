@@ -23,6 +23,8 @@ export default class CodeEditor extends Vue {
 
   public cminstance!: codemirror.EditorFromTextArea;
 
+  public markTexts!: codemirror.TextMarker[]
+
   @Watch('value')
   public handelValue() {
     const value = this.cminstance.getValue()
@@ -41,6 +43,8 @@ export default class CodeEditor extends Vue {
       mode: this.mode
     })
     this.cminstance.setValue(this.value)
+    // this.cminstance.getLine(0).length
+    // this.cminstance.markText({line: 0, ch: 0}, {line: 0, ch: this.cminstance.getLine(0).length}, { className: 'test-class' })
     this.cminstance.on('change', () => {
       const value = this.cminstance.getValue()
       this.$emit('input', value)
@@ -56,6 +60,7 @@ export default class CodeEditor extends Vue {
 
   public mounted() {
     this.initialize()
+    this.markTexts = []
     addListener(this.$el as HTMLElement, this.setSize)
     this.setSize()
   }
@@ -64,11 +69,20 @@ export default class CodeEditor extends Vue {
     removeListener(this.$el as HTMLElement, this.setSize)
   }
 
-  public focusCode (code: string) {
+  public markText (code: string, scroll: boolean) {
     const searchCursor = this.cminstance.getSearchCursor(code)
     if (searchCursor.findNext()) {
-      // this.cminstance.markText(searchCursor.from(), searchCursor.to(), { css: 'color : red' })
-      this.cminstance.setSelection(searchCursor.from(), searchCursor.to(), { scroll: true })
+      const from = searchCursor.from()
+      const to = searchCursor.to()
+      const markText = this.cminstance.markText(from, to, { className: 'mark-class'  })
+      this.markTexts.push(markText)
+      scroll && this.cminstance.scrollTo(0, from.line * 13 + 3)
+    }
+  }
+
+  public clearMarkText () {
+    for (const markText of this.markTexts) {
+      markText.clear()
     }
   }
 }
@@ -81,5 +95,10 @@ export default class CodeEditor extends Vue {
   ::v-deep {
     div.CodeMirror-selected { background: rgba(255,255,255,0.3) !important;}
   }
+}
+</style>
+<style>
+.mark-class {
+  background: rgba(215,215,215,0.075);
 }
 </style>

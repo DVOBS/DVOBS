@@ -8,13 +8,21 @@
     @click.stop="handleClick"
   >
     <div class="label">
-      <span class="button">
+      <span
+        class="button"
+        :class="{ active: visible }"
+        @click="visible = !visible"
+      >
         <font-awesome-icon
           class="button-icon"
           :icon="['fa', 'eye']"
         />
       </span>
-      <span class="button">
+      <span
+        class="button"
+        :class="{ active: lock }"
+        @click="lock = !lock"
+      >
         <font-awesome-icon
           class="button-icon lock"
           :icon="['fa', 'lock']"
@@ -121,6 +129,22 @@ export default class DataScreenHierarchyNode extends Vue {
     return false
   }
 
+  private get lock() {
+    return this.widgetConfig.lock
+  }
+
+  private set lock(val) {
+    this.widgetConfig.lock = val
+  }
+
+  private get visible() {
+    return this.widgetConfig.visible
+  }
+
+  private set visible(val) {
+    this.widgetConfig.visible = val
+  }
+
   public handleClick(event: MouseEvent) {
     this.dataScreenFileEditor.selectWidgetConfig(this.widgetConfig.id, event.ctrlKey)
   }
@@ -171,6 +195,13 @@ export default class DataScreenHierarchyNode extends Vue {
     height: 26px;
     text-align: center;
     border-right: solid 1px rgba($border-color, 0.5);
+  }
+
+  .label .button.active {
+    color: $primary-color;
+    .button-icon {
+      opacity: 1;
+    }
   }
 
   .label .title {

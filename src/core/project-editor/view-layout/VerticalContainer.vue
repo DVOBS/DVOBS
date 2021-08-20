@@ -242,8 +242,8 @@ export default class VerticalContainer extends Vue {
   }
   &>.item .resize-handler{
     position: absolute;
-    height: 7px;
-    bottom: -4px;
+    height: 5px;
+    bottom: -3px;
     left: 0;
     right: 0;
     background: transparent;

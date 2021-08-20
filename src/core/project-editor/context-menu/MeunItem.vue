@@ -47,4 +47,8 @@ export default class MeunItem extends Vue {
   background: rgba(0,0,0,0.25);
   border-left: solid 1px $primary-color;
 }
+.MeunItem.disable:hover {
+  background: none;
+  border-left: solid 1px transparent;
+}
 </style>

@@ -1,4 +1,6 @@
+import { getWidgetDefinition } from '@/widgets-data-screen'
 import shortid from 'shortid'
+import Vue from 'vue'
 import { ASTElement } from 'vue-template-compiler'
 
 function space(count: number) {
@@ -11,9 +13,26 @@ function numberValue(val: string) {
 
 function stringVlaue(str:string) {
   if (str.startsWith('"') && str.endsWith('"')) {
-    return str.slice(1,-1)
+    const obj = JSON.parse(`{"value":${str}}`)
+    return obj.value
   }
   return str
+}
+
+function valueOfAttr(str:string) {
+  if (str.startsWith('"') && str.endsWith('"')) {
+    const obj = JSON.parse(`{"value":${str}}`)
+    return obj.value
+  }
+  if (!isNaN(Number(str))) {
+    return Number(str)
+  }
+  if (str === 'true') {
+    return true
+  }
+  if (str === 'false') {
+    return false
+  }
 }
 
 export class DataScreenConfig {
@@ -24,6 +43,7 @@ export class DataScreenConfig {
   public widgetConfigs: WidgetConfig[] = []
 
   constructor(ast: ASTElement | undefined) {
+    console.log(1)
     if (ast?.tag === 'DataScreen') {
       const attrs = ast.attrs || []
       for (const {name, value} of attrs) {
@@ -80,6 +100,9 @@ export class WidgetConfig {
   /** 组件ID */
   public parentId = ''
 
+  /** WidgetTag */
+  public widgetTag = ''
+
   /** 锚点的位置 */
   public anchor = 'left-top';
 
@@ -101,7 +124,13 @@ export class WidgetConfig {
   /** 实际宽度 */
   public runtimeHeight = 0
 
-  public details = {}
+  /** 锁定 */
+  public lock = false
+
+  /** 可见性 */
+  public visible = true
+
+  public attrs: any = {}
 
   public children:WidgetConfig[] = []
 
@@ -130,13 +159,42 @@ export class WidgetConfig {
           case 'height':
             this.height = numberValue(value)
             break
+          case 'visible':
+            this.visible = valueOfAttr(value)
+            break
+          case 'lock':
+            this.lock = valueOfAttr(value)
+            break
           default:
             break
         }
       }
       
       if (ast.tag === 'Widget') {
-        //
+        if (ast.children.length === 1 && ast.children[0].type === 1) {
+          this.setWidgetTag(ast.children[0].tag)
+          const attrs = ast.children[0].attrs || []
+          const attrsMap = new Map()
+
+          for (const attr of attrs) {
+            attrsMap.set(attr.name, valueOfAttr(attr.value))
+          }
+
+          const widgetDefinition = getWidgetDefinition(this.widgetTag)
+
+          this.attrs = {}
+          for (const propsGroup of widgetDefinition?.propsGroups || []) {
+            for (const prop of propsGroup.props) {
+              if (attrsMap.has(prop.key)) {
+                Vue.set(this.attrs, prop.key, attrsMap.get(prop.key))
+              } else {
+                Vue.set(this.attrs, prop.key, prop.value)
+              }
+            }
+          }
+        } else {
+          console.error((`Widget element must has one child'`))
+        }
       }
 
       if (ast.tag === 'WidgetGroup') {
@@ -154,18 +212,55 @@ export class WidgetConfig {
     }
   }
 
+  public setWidgetTag(tag: string) {
+    this.widgetTag = tag
+    this.attrs = {}
+    const widgetDefinition = getWidgetDefinition(tag)
+    for (const propsGroup of widgetDefinition?.propsGroups || []) {
+      for (const prop of propsGroup.props) {
+        Vue.set(this.attrs, prop.key, prop.value)
+      }
+    }
+  }
+
   public generateCode(depth: number) {
     const tag = this.isGroup ? 'WidgetGroup' : 'Widget'
+    const widgetTag = this.widgetTag
     let code = `${space(depth * 2)}<${tag}\n`
     code += `${space(depth * 2 + 2)}name="${this.name}"\n`
     code += `${space(depth * 2 + 2)}ref="${this.id}"\n`
+    code += `${space(depth * 2 + 2)}:visible="${this.visible}"\n`
+    code += `${space(depth * 2 + 2)}:lock="${this.lock}"\n`
     code += `${space(depth * 2 + 2)}:x="${this.x}"\n`
     code += `${space(depth * 2 + 2)}:y="${this.y}"\n`
     code += `${space(depth * 2 + 2)}:width="${this.width}"\n`
     code += `${space(depth * 2 + 2)}:height="${this.height}"\n`
     code += `${space(depth * 2)}>\n`
-    for (const widgetConfig of this.children) {
-      code += widgetConfig.generateCode(depth + 1)
+    if (this.isGroup) {
+      for (const widgetConfig of this.children) {
+        code += widgetConfig.generateCode(depth + 1)
+      }
+    } else if(widgetTag) {
+      code += `${space(depth * 2 + 2)}<${widgetTag}\n`
+      const widgetDefinition = getWidgetDefinition(widgetTag)
+      for (const propsGroup of widgetDefinition?.propsGroups || []) {
+        for (const prop of propsGroup.props) {
+          const key = prop.key
+          const value = (
+            this.attrs[key] !== null &&
+            this.attrs[key] !== undefined
+          ) ? this.attrs[key] : prop.value
+          switch (prop.type) {
+            case 'number':
+              code += `${space(depth * 2 + 4)}:${key}="${value}"\n`
+              break
+            default:
+              code += `${space(depth * 2 + 4)}${key}="${value}"\n`
+              break
+          }
+        }
+      }
+      code += `${space(depth * 2 + 2)}><${widgetTag}/>\n`
     }
     code += `${space(depth * 2)}</${tag}>\n`
     return code

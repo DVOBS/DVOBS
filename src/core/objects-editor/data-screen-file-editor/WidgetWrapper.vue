@@ -1,7 +1,16 @@
 <template>
-  <div class="WidgetWrapper" :class="{ isGroup }" :style="style">
+  <div
+    v-show="visible"
+    class="WidgetWrapper"
+    :class="{ isGroup }"
+    :style="style"
+  >
     <template v-if="!this.isGroup">
-      <span>WidgetWrapper</span>
+      <component
+        v-if="component"
+        v-bind="attrs"
+        :is="component"
+      ></component>
     </template>
     <template v-else>
       <WidgetWrapper
@@ -14,8 +23,9 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { WidgetConfig } from './DataScreenModels'
 import { addListener, removeListener } from 'resize-detector'
+import { getWidgetDefinition } from '@/widgets-data-screen'
+import { WidgetConfig } from './DataScreenModels'
 
 @Component({
   name: 'WidgetWrapper'
@@ -24,6 +34,8 @@ export default class WidgetWrapper extends Vue {
   @Prop()
   public widgetConfig !: WidgetConfig
 
+  private clientWidth = -1
+  private clientHeight = -1
   
   public get isGroup() {
     return this.widgetConfig.isGroup
@@ -36,9 +48,6 @@ export default class WidgetWrapper extends Vue {
   private get autoSize() {
     return this.widgetConfig.isGroup
   }
-
-  private clientWidth = -1
-  private clientHeight = -1
 
   public get style() {
     const autoSize = this.autoSize
@@ -96,6 +105,22 @@ export default class WidgetWrapper extends Vue {
     return style
   }
 
+  public get widgetDefinition() {
+    return getWidgetDefinition(this.widgetConfig.widgetTag)
+  }
+
+  public get component() {
+    return this.widgetDefinition?.component
+  }
+
+  public get attrs() {
+    return this.widgetConfig.attrs
+  }
+
+  public get visible() {
+    return this.widgetConfig.visible
+  }
+
   private resizeHandler() {
     const $el = this.$el
     const width = $el.clientWidth
@@ -126,9 +151,9 @@ export default class WidgetWrapper extends Vue {
 @import '~@/assets/style/variables.scss';
 .WidgetWrapper {
   position: absolute;
-  background: rgba(255,0,0,0.25);
-  &.isGroup {
-    background: rgba(0,0,255,0.25);
-  }
+  // background: rgba(255,0,0,0.25);
+  // &.isGroup {
+  //   background: rgba(0,0,255,0.25);
+  // }
 }
 </style>

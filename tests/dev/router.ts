@@ -6,8 +6,8 @@ Vue.use(VueRouter)
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'Home',
-    component: () => import('./views/VueFileEditorTest.vue')
+    name: '',
+    component: () => import('./views/V3cTest.vue')
   }
 ]
 

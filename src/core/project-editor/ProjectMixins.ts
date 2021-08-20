@@ -1,6 +1,7 @@
 import { Component, Ref, Vue, Watch } from 'vue-property-decorator'
 
-import Jszip, { files } from 'jszip'
+import Jszip from 'jszip'
+import { saveAs } from 'file-saver'
 import axios from 'axios'
 import throttle from 'lodash.throttle'
 import localforage from 'localforage'
@@ -48,6 +49,31 @@ export default class ProjectMixins extends Vue {
   public uploadProjectFile() {
     this.fileInput.value = ''
     this.fileInput.click()
+  }
+
+  /** 下载项目文件 */
+  public async donwloadProjectFile() {
+
+    const traverse = (directory: ProjectDirectory, parent: Jszip | null) => {
+      const result = parent || new Jszip()
+
+      for (const subDir of directory.directorys) {
+        const folder =  result.folder(subDir.name)
+        traverse(subDir, folder)
+      }
+
+      for (const file of directory.files) {
+        result.file(file.name, file.base64, { base64: true })
+      }
+
+      return result
+    }
+
+    if (this.project?.rootDirectory) {
+      const zip = traverse(this.project.rootDirectory, null)
+      const content = await zip.generateAsync({ type: 'blob' })
+      saveAs(content)
+    }
   }
 
   /** 上传项目文件回调 */

@@ -17,6 +17,24 @@
 </head>
 
 <body>
+  <script>
+    function sum(a, b, c, d) {
+      return a + b + c + d
+    }
+    function curry(fn) {
+      return function sum(...args) {
+        if (args.length < fn.length) {
+          return function () {
+            return sum(...args, ...arguments)
+          }
+        }
+        return fn(...args)// 不要求改变this,
+      }
+    }
+    let curriedSum = curry(sum)
+    console.log(curriedSum(1)(2)(3)(4))//10
+    console.log(curriedSum(1, 2)(2, 4))//9
+  </script>
   <canvas id="canvas" width="1200" height="800"></canvas>
 
   <script type="text/javascript">

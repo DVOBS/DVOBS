@@ -1,5 +1,6 @@
 <template>
   <div
+    v-show="visible && (!lock || isSelected)"
     class="WidgetController"
     :class="{
       isSelected,
@@ -7,7 +8,7 @@
       hasChildren
     }"
     :style="style"
-    @mousedown.stop="startDrag($event, 'move')"
+    @mousedown="startDrag($event, 'move')"
     @click="handleWidgetControllerClick"
   >
     <template v-if="isSelected">
@@ -249,6 +250,14 @@ export default class WidgetController extends Vue {
     }
   }
 
+  get lock() {
+    return this.widgetConfig.lock
+  }
+
+  get visible() {
+    return this.widgetConfig.visible
+  }
+
   @Watch('children', { immediate: true, deep: true })
   private childrenChange() {
     this.recomputationDebounce()
@@ -330,6 +339,10 @@ export default class WidgetController extends Vue {
 
   public startDrag (event: MouseEvent, dragModel: string) {
     if (!this.isSelected) {
+      return
+    }
+
+    if (this.lock) {
       return
     }
 
@@ -530,6 +543,10 @@ export default class WidgetController extends Vue {
   }
 
   private handleWidgetControllerClick(event: MouseEvent) {
+    if (this.lock) {
+      return
+    }
+  
     let isMove = false
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let current = this as any

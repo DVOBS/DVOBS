@@ -234,10 +234,10 @@ export default class HorizontalContainer extends Vue {
   }
   &>.item .resize-handler{
     position: absolute;
-    width: 7px;
+    width: 5px;
     top: 0;
     bottom: 0;
-    right: -4px;
+    right: -3px;
     background: transparent;
     cursor: ew-resize;
     z-index: 21;

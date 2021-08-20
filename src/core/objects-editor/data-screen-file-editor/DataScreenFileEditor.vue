@@ -1,12 +1,22 @@
 <template>
-  <div class="DataScreenFileEditor">
+  <div class="DataScreenFileEditor" :class="mode">
     <div class="body">
-      <div class="tool-bar"></div>
+      <div class="tool-bar">
+        <el-button v-if="mode === 'design-code'" size="mini" round>拆分</el-button>
+        <el-button v-else size="mini" type="text" @click="mode = 'design-code'">拆分</el-button>
+        <el-button v-if="mode === 'design'" size="mini" round>视图</el-button>
+        <el-button v-else size="mini" type="text" @click="mode = 'design'">视图</el-button>
+        <el-button v-if="mode === 'code'" size="mini" round>代码</el-button>
+        <el-button v-else size="mini" type="text" @click="mode = 'code'">代码</el-button>
+      </div>
       <coordinate-system
+        v-show="mode === 'design-code' || mode === 'design'"
         class="preview"
         ref="coordinateSystem"
         @click.native="clearSelected"
         @contextmenu.native.prevent="handleContextmenu"
+        @dragover.native="handleDragover"
+        @drop.native="handleDrop"
       >
         <DataScreenPreviewer
           :dataScreenConfig="dataScreenConfig"
@@ -19,34 +29,54 @@
           ></WidgetController>
         </template>
       </coordinate-system>
-      <div class="splitter"></div>
+      <div class="splitter" v-show="mode === 'design-code'"></div>
       <CodeEditor
+        v-show="mode === 'design-code' || mode === 'code'"
         class="code-editor"
         ref="codeEditor"
         v-model="content"
       ></CodeEditor>
     </div>
     <ContextMenu ref="contextMenu">
-      <MeunItem label="编组" @click="groupSelectedWidgetConfigs"></MeunItem>
+      <MeunItem
+        label="编组"
+        :disable="selectedWidgetConfigs.length <= 1" @click="groupSelectedWidgetConfigs"
+      ></MeunItem>
+      <MeunItem
+        label="取消编组"
+        :disable="!singleSelectedWidgetConfigIsGroup"
+        @click="ungroupSelectedWidgetConfigs"
+      ></MeunItem>
+      <MeunItemSplitLine></MeunItemSplitLine>
+      <MeunItem
+        label="删除"
+        :disable="selectedWidgetConfigs.length === 0" @click="deleteAllSelectedWidgetConfig"
+      ></MeunItem>
     </ContextMenu>
   </div>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue, Provide, Ref, Watch } from 'vue-property-decorator'
 import { encode, decode } from 'js-base64'
-import { compile } from 'vue-template-compiler'
+import { ASTElement, ASTNode, compile } from 'vue-template-compiler'
 import ProjectFile from '@/core/model/ProjectFile'
 import CodeEditor from '@/core/objects-editor/code-editor/CodeEditor.vue'
 import ContextMenu from '@/core/project-editor/context-menu/ContextMenu.vue'
 import MeunItem from '@/core/project-editor/context-menu/MeunItem.vue'
+import CoordinateSystem from '@/core/common/coordinate-system/CoordinateSystem.vue'
+import MeunItemSplitLine from '@/core/project-editor/context-menu/MeunItemSplitLine.vue'
 import { DataScreenConfig, WidgetConfig } from './DataScreenModels'
 import DataScreenPropertyInspector from './DataScreenPropertyInspector.vue'
 import DataScreenHierarchyInspector from './DataScreenHierarchyInspector.vue'
+import DataScreenWidgetLibrary from './DataScreenWidgetLibrary.vue'
 import DataScreenPreviewer from './DataScreenPreviewer.vue'
 import WidgetController from './WidgetController.vue'
+import { MessageBox } from 'element-ui'
+import { getWidgetDefinition } from '@/widgets-data-screen'
+// import deepEq from 'deep-strict-equal'
 
 @Component({
-  components: { CodeEditor, DataScreenPreviewer, WidgetController, ContextMenu, MeunItem }
+  components: { CodeEditor, DataScreenPreviewer, WidgetController, ContextMenu, MeunItem, MeunItemSplitLine }
 })
 export default class DataScreenFileEditor extends Vue {
   @Provide('dataScreenFileEditor')
@@ -57,6 +87,14 @@ export default class DataScreenFileEditor extends Vue {
 
   @Ref()
   public contextMenu! :ContextMenu
+  
+  @Ref()
+  public codeEditor! :CodeEditor
+
+  @Ref()
+  public coordinateSystem!: CoordinateSystem
+
+  private mode = 'design-code' // design code design-code
 
   /** 选中的控件或控件组的Id数组 */
   public selectedIds: string[] = []
@@ -67,6 +105,10 @@ export default class DataScreenFileEditor extends Vue {
 
   public get hierarchyInspector() {
     return DataScreenHierarchyInspector
+  }
+
+  public get wdgetLibrary() {
+    return DataScreenWidgetLibrary
   }
 
   public get content() {
@@ -121,19 +163,110 @@ export default class DataScreenFileEditor extends Vue {
     return this.allWidgetConfigs.filter((d) => this.selectedIds.indexOf(d.id) !== -1) || []
   }
 
+  /** 单选的控件设置 */
+  public get singleSelectedWidgetConfig() {
+    return this.selectedWidgetConfigs.length === 1 ? this.selectedWidgetConfigs[0] : null
+  }
+
+  public get singleSelectedWidgetConfigIsGroup() {
+    return this.singleSelectedWidgetConfig?.isGroup
+  }
+
+  public get allAstNode() {
+    const result: Map<string, ASTElement> = new Map()
+    const traverse = (astNode: ASTNode) => {
+      if (astNode.type === 1) {
+        if (astNode.ref) {
+          result.set(astNode.ref, astNode)
+        }
+        for (const child of astNode.children) {
+          traverse(child)
+        }
+      }
+    }
+    if (this.ast) {
+      traverse(this.ast)
+    }
+    return result
+  }
+
+  @Watch('selectedIds')
+  @Watch('allAstNode')
+  public async singleSelectedWidgetConfigChange() {
+    await this.$nextTick()
+    const asts = this.selectedIds.map((id) => this.allAstNode.get('"' + id + '"'))
+    asts.forEach((astNode: any) => {
+      if (astNode) {
+        const start = astNode.start
+        const end = astNode.end
+        const code = this.content.slice(start,end)
+        this.codeEditor.clearMarkText()
+        this.codeEditor.markText(code, true)
+      }
+    })
+  }
+
   @Watch('dataScreenConfig', { deep: true })
   public dataScreenConfigChange(dataScreen: DataScreenConfig, oldDataScreen: DataScreenConfig) {
     if (dataScreen === oldDataScreen) {
       console.log('DataScreen 自身变化')
-      this.content = this.dataScreenConfig.generateCode()
+      const content = this.dataScreenConfig.generateCode()
+      // const ast= compile(content, { outputSourceRange: false })
+      // const astChange = deepEq(ast,this.ast)
+      // console.log( astChange ? '语法树无变化' : '语法树发生变化')
+      this.content = content
     } else {
       console.log('重新生成的 DataScreen')
+    }
+  }
+
+  private handleDragover(event: DragEvent) {
+    if (event.dataTransfer && event.dataTransfer.types.indexOf('widgetDefinitionTag'.toLowerCase()) !== -1) {
+      event.preventDefault()
+    }
+  }
+
+  private handleDrop (event: DragEvent) {
+    if (event.dataTransfer) {
+      const widgetDefinitionTag = event.dataTransfer.getData('widgetDefinitionTag'.toLowerCase())
+      if (widgetDefinitionTag) {
+        const { x, y } = this.coordinateSystem.getAxisPosition(event)
+        this.addWidget(widgetDefinitionTag, x, y)
+      }
     }
   }
 
   /** 打开右键菜单 */
   public handleContextmenu(event: MouseEvent) {
     this.contextMenu.open(event.clientX, event.clientY)
+  }
+
+  public addWidget(widgetTag: string, x?: number, y?: number) {
+    const widgetConfig = new WidgetConfig()
+    const widgetDefinition = getWidgetDefinition(widgetTag)
+    if (widgetDefinition) {
+      widgetConfig.name = widgetDefinition.displayName
+    }
+    widgetConfig.widgetTag = widgetTag
+    widgetConfig.x = x || 0
+    widgetConfig.y = y || 0
+    this.widgetConfigs.push(widgetConfig)
+  }
+
+  /** 删除所选中的控件 */
+  public async deleteAllSelectedWidgetConfig () {
+    try {
+      await MessageBox.confirm('是否删除选中的控件？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      for (const selectedId of this.selectedIds) {
+        if (selectedId) {
+          this.deleteWidgetConfigById(selectedId)
+        }
+      }
+    } catch (error) { /** */}
   }
 
   /** 根据ID获取WidgetConfig */
@@ -245,6 +378,36 @@ export default class DataScreenFileEditor extends Vue {
     }
   }
 
+    /** 解组选中的组件 */
+  public ungroupSelectedWidgetConfigs() {
+    // 取消组
+    const singleSelectedWidgetConfig = this.singleSelectedWidgetConfig
+
+    if (
+      singleSelectedWidgetConfig &&
+      singleSelectedWidgetConfig.isGroup
+    ) {
+      const parentId = singleSelectedWidgetConfig.parentId
+      const children = singleSelectedWidgetConfig.children
+      for (const child of children) {
+        child.x += singleSelectedWidgetConfig.x
+        child.y += singleSelectedWidgetConfig.y
+        child.parentId = parentId
+      }
+      
+      const parentWidget = this.getWidgetConfigById(parentId)
+
+      if (parentWidget) {
+        const index = parentWidget.children.indexOf(singleSelectedWidgetConfig)
+        parentWidget.children.splice(index, 1, ...children)
+      } else {
+        const index = this.dataScreenConfig.widgetConfigs.indexOf(singleSelectedWidgetConfig)
+        this.dataScreenConfig.widgetConfigs.splice(index, 1, ...children)
+      }
+    }
+    
+  }
+
   /** 清除所有 */
   public clearSelected () {
     this.selectedIds = []
@@ -268,13 +431,25 @@ export default class DataScreenFileEditor extends Vue {
     background: $panel-background-dark-color;
   }
   .tool-bar {
+    text-align: left;
+    padding-left: 5px;
     height: 32px;
+    line-height: 28px;
     background: $panel-background-color;
   }
+
   .preview,
   .code-editor {
-    height: calc(50% - 17px);
+    height: calc(100% - 34px);
   }
+
+  &.design-code {
+    .preview,
+    .code-editor {
+      height: calc(50% - 17px);
+    }
+  }
+
   .splitter {
     height: 2px;
     background: $panel-background-color;

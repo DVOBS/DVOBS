@@ -3,7 +3,7 @@
     <div
       class="item"
       v-for="(child, i) in children"
-      :key="i"
+      :key="child.id"
       :style="{
         'height': child.basis + '%'
       }"
@@ -37,6 +37,7 @@ import { addListener, removeListener } from 'resize-detector'
 import ViewLayout from './ViewLayout.vue'
 import ViewPanelTabs from './ViewPanelTabs.vue'
 import MainContainer from './MainContainer.vue'
+import shortid from 'shortid'
 
 const HorizontalContainer = () => import('./HorizontalContainer.vue')
 
@@ -72,16 +73,22 @@ export default class VerticalContainer extends Vue {
     return this.children.length === 1
   }
 
+  public get isDraging() {
+    return this.layout.isDraging
+  }
+
+  @Watch('isDraging')
   @Watch('isEmpty', { immediate: true})
   public isEmptyChange(isEmpty: boolean) {
-    if (isEmpty) {
+    if (isEmpty && !this.isDraging) {
       this.$emit('remove')
     }
   }
 
+  @Watch('isDraging')
   @Watch('isSingle', { immediate: true})
   public isSingleChange(isEmpty: boolean) {
-    if (isEmpty) {
+    if (isEmpty && !this.isDraging) {
       this.$emit('single')
     }
   }
@@ -123,19 +130,21 @@ export default class VerticalContainer extends Vue {
 
   public async handleTabDrop(postion: string, index: number) {
     await this.$nextTick()
-    console.log(postion, index)
+    // console.log(postion, index)
     const dragTab = this.layout.dragTab
     const dragTabs = this.layout.dragTabs
 
     const currentNode = this.node.children[index] as TabsLayoutNode
 
     const tabNode: TabsLayoutNode = {
+      id: shortid.generate(),
       type: 'tabs',
       basis: 0,
       children: [dragTab]
     }
 
     const newHorizontalLayoutNode: HorizontalLayoutNode = {
+      id: shortid.generate(),
       type: 'horizontal',
       basis: 0,
       children: []
@@ -164,6 +173,7 @@ export default class VerticalContainer extends Vue {
         this.node.children.splice(index, 1, newHorizontalLayoutNode)
       }
 
+      // debugger
       dragTabs?.removeTab(dragTab)
       this.layout.dragTab = ''
       this.layout.dragTabs = null

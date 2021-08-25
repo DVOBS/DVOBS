@@ -24,7 +24,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { addListener, removeListener } from 'resize-detector'
-import { getWidgetDefinition } from '@/widgets-data-screen'
+import { getWidgetDefinition } from '@/core/widgets-data-screen'
 import { WidgetConfig } from './DataScreenModels'
 
 @Component({
@@ -36,7 +36,7 @@ export default class WidgetWrapper extends Vue {
 
   private clientWidth = -1
   private clientHeight = -1
-  
+
   public get isGroup() {
     return this.widgetConfig.isGroup
   }
@@ -46,7 +46,7 @@ export default class WidgetWrapper extends Vue {
   }
 
   private get autoSize() {
-    return this.widgetConfig.isGroup
+    return this.widgetConfig.isGroup || this.widgetDefinition?.autoSize
   }
 
   public get style() {
@@ -58,8 +58,8 @@ export default class WidgetWrapper extends Vue {
     const top = Math.round(widgetConfig.y)
 
     const style = {
-      width: width + 'px',
-      height: height + 'px',
+      width: autoSize? 'auto' : (width + 'px'),
+      height: autoSize? 'auto' : (height + 'px'),
       left: left + 'px',
       top: top + 'px',
       marginLeft: '',

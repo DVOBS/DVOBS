@@ -40,7 +40,8 @@ export default class CodeEditor extends Vue {
       value: this.value,
       theme: 'material-darker',
       lineNumbers: true,
-      mode: this.mode
+      mode: this.mode,
+      undoDepth: 0,
     })
     this.cminstance.setValue(this.value)
     // this.cminstance.getLine(0).length

@@ -79,7 +79,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue, Inject } from 'vue-property-decorator'
+import { Component, Prop, Vue, Provide, Inject, Watch } from 'vue-property-decorator'
 import draggable from 'vuedraggable'
 import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
 import TxtEditor from '@/core/common/text-editor/TxtEditor.vue'
@@ -94,6 +94,12 @@ import { WidgetConfig } from './DataScreenModels'
   }
 })
 export default class DataScreenHierarchyNode extends Vue {
+  @Provide('parentNode')
+  public get self (): DataScreenHierarchyNode { return this }
+
+  @Inject({ from: 'parentNode', default: null })
+  public parentNode!: DataScreenHierarchyNode | null
+
   @Inject('projectEditor')
   public projectEditor!: ProjectEditor
 
@@ -145,11 +151,18 @@ export default class DataScreenHierarchyNode extends Vue {
     this.widgetConfig.visible = val
   }
 
+  @Watch('isSelected')
+  public isSelectedChange(isSelected: boolean) {
+    if (isSelected) {
+      this.expandParent(true)
+    }
+  }
+
   public handleClick(event: MouseEvent) {
     this.dataScreenFileEditor.selectWidgetConfig(this.widgetConfig.id, event.ctrlKey)
   }
 
-  private handleChange ({ added }: { added: { element: WidgetConfig } }) {
+  public handleChange ({ added }: { added: { element: WidgetConfig } }) {
     if (added) {
       const parentWidget = this.widgetConfig
       const widgetConfig = added.element as WidgetConfig
@@ -164,6 +177,15 @@ export default class DataScreenHierarchyNode extends Vue {
       this.children.length === 0
     ) {
       this.dataScreenFileEditor.deleteWidgetConfigById(this.widgetConfig.id)
+    }
+  }
+
+  public expandParent(isStart?: boolean) {
+    if (!isStart) {
+      this.expanded = true
+    }
+    if(this.parentNode) {
+      this.parentNode.expandParent()
     }
   }
 }

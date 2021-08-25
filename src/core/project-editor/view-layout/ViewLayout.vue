@@ -53,11 +53,22 @@ export default class ViewLayout extends Vue {
     }, 0);
   }
 
+  public handleDragend() {
+    this,this.isDraging = false
+    this.dragTab = ''
+    this.dragTabs = null
+  }
+
   public async mounted() {
     const layout = await localforage.getItem('layout')
+    document.addEventListener('dragend', this.handleDragend)
     if (layout) {
       this.rootNode = layout as HorizontalLayoutNode
     }
+  }
+
+  public destroyed() {
+    document.removeEventListener('dragend', this.handleDragend)
   }
 }
 </script>
@@ -66,6 +77,7 @@ export default class ViewLayout extends Vue {
 .ViewLayout {
   display: flex;
   .root-ontainer {
+    width: 100%;
     flex-grow: 1;
   }
 }

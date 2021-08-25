@@ -71,9 +71,11 @@
 <script lang="ts">
 import { Component, Vue, Inject, Prop, Watch } from 'vue-property-decorator'
 import debounce from 'lodash.debounce'
+import throttle from 'lodash.throttle'
 import CoordinateSystem from '@/core/common/coordinate-system/CoordinateSystem.vue'
 import DataScreenFileEditor from './DataScreenFileEditor.vue';
 import { WidgetConfig } from './DataScreenModels';
+import { getWidgetDefinition } from '@/core/widgets-data-screen';
 
 @Component({
   name: 'WidgetController'
@@ -107,8 +109,12 @@ export default class WidgetController extends Vue {
     clientY: 0,
   }
 
+  get widgetDefinition() {
+    return getWidgetDefinition(this.widgetConfig.widgetTag)
+  }
+
   get autoSize() {
-    return this.widgetConfig.isGroup
+    return this.widgetConfig.isGroup || this.widgetDefinition?.autoSize
   }
 
   get children() {
@@ -200,7 +206,7 @@ export default class WidgetController extends Vue {
       anchor === 'center-top' ||
       anchor === 'center-bottom'
     ) {
-      anchorRevise = widgetConfig.width / 2
+      anchorRevise = widgetConfig.runtimeWidth / 2
     }
 
     if (
@@ -208,7 +214,7 @@ export default class WidgetController extends Vue {
       anchor === 'right-bottom' ||
       anchor === 'right-center'
     ) {
-      anchorRevise = widgetConfig.width / 2
+      anchorRevise = widgetConfig.runtimeWidth / 2
     }
 
     if (this.inGroup) {
@@ -232,7 +238,7 @@ export default class WidgetController extends Vue {
       anchor === 'center-top' ||
       anchor === 'center-bottom'
     ) {
-      anchorRevise = widgetConfig.height / 2
+      anchorRevise = widgetConfig.runtimeHeight / 2
     }
 
     if (
@@ -240,7 +246,7 @@ export default class WidgetController extends Vue {
       anchor === 'right-bottom' ||
       anchor === 'right-center'
     ) {
-      anchorRevise = widgetConfig.height / 2
+      anchorRevise = widgetConfig.runtimeHeight / 2
     }
 
     if (this.inGroup) {
@@ -260,12 +266,12 @@ export default class WidgetController extends Vue {
 
   @Watch('children', { immediate: true, deep: true })
   private childrenChange() {
-    this.recomputationDebounce()
+    this.recomputationThrottle()
   }
 
-  private recomputationDebounce = debounce(() => {
-    this.recomputation()
-  }, 100)
+  private recomputationThrottle = throttle(this.recomputation, 500)
+
+  private recomputationDebounce = debounce(this.recomputation, 100)
 
   private async recomputation () {
     if (this.children.length > 0) {
@@ -590,6 +596,7 @@ export default class WidgetController extends Vue {
 @import '~@/assets/style/variables.scss';
 
 $selected-color: #ffa500;
+$parent-selected-color: rgb(0, 165, 255, 0.5);
 $group-color: rgb(0, 165, 255, 0.15);
 
 .WidgetController {
@@ -603,7 +610,11 @@ $group-color: rgb(0, 165, 255, 0.15);
   &.isSelected,
   &.hasChildSelected {
     border: 1px dashed $selected-color;
-    background: rgba(0,0,0,0.25);
+    background: rgba(0,0,0,0);
+  }
+
+  &.hasChildSelected {
+    border-color: $parent-selected-color;
   }
 
   &.isSelected {

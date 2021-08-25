@@ -118,10 +118,7 @@ export default class ProjectEditor extends Mixins(ProjectMixins, ContextMenuMixi
     return []
   }
 
-  public openObjectEditor(
-    object: EditableObject,
-    isPreview = false
-  ) {
+  public openObjectEditor(object: EditableObject,isPreview = false) {
     return this.objectEditorTabs.openObjectEditor(object, isPreview)
   }
 
@@ -131,6 +128,21 @@ export default class ProjectEditor extends Mixins(ProjectMixins, ContextMenuMixi
 
   public handleChangeEditor(objectEditor: Vue) {
     this.currentObjectEditor = objectEditor
+  }
+
+  private handleKeydown (event: KeyboardEvent) {
+    const sub = (this.currentObjectEditor as any)
+    if (sub && sub.handleKeydown) {
+      sub.handleKeydown(event)
+    }
+  }
+
+  public async mounted() {
+    document.addEventListener('keydown', this.handleKeydown)
+  }
+
+  private beforeDestroy () {
+    document.removeEventListener('keydown', this.handleKeydown)
   }
 }
 </script>

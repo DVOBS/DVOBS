@@ -6,6 +6,7 @@
         v-model="innerTabs"
         group="ViewPanelTabs"
         @add="handleAdd"
+        @end="handleEnd"
       >
         <div
           v-for="(tab) in innerTabs"
@@ -78,7 +79,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Ref, Inject, ModelSync, Watch } from 'vue-property-decorator'
+import { Component, Vue, Ref, Inject, Model, Watch } from 'vue-property-decorator'
 import draggable from "vuedraggable"
 import ViewLayout from './ViewLayout.vue'
 import CrossRenderView from '@/core/common/cross-render/CrossRenderView.vue'
@@ -93,13 +94,21 @@ export default class ViewPanelTabs extends Vue {
   @Inject('layout')
   public layout!: ViewLayout
 
-  @ModelSync('tabs', 'change', { type: Array })
-  readonly innerTabs!:  string[]
+  @Model('change', { type: Array })
+  readonly tabs!:  string[]
 
   @Ref()
   public tabsDiv!: HTMLDivElement
 
   public dragPostion = ''
+
+  public get innerTabs() {
+    return this.tabs
+  }
+
+  public set innerTabs(value: string[]) {
+    this.$emit('change', value)
+  }
 
   public get isEmpty() {
     return this.innerTabs.length === 0
@@ -160,8 +169,13 @@ export default class ViewPanelTabs extends Vue {
   public handleAdd() {
     this.activeTab = this.layout.dragTab
     this.layout.dragTabs = this
+  }
+
+  public handleEnd() {
     setTimeout(() => {
       this.activeTab = ''
+      this.layout.isDraging = false
+      this.layout.dragTab = ''
       this.layout.dragTabs = null
     }, 100);
   }

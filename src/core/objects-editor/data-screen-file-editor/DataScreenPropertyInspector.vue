@@ -47,6 +47,22 @@
         :object="singleSelectedWidgetConfig"
       />
       <PropertyItem
+        label="宽度"
+        :prop="autoSize? 'runtimeWidth' : 'width'"
+        type="number"
+        :object="singleSelectedWidgetConfig"
+        :step="1"
+        :disabled="autoSize"
+      />
+      <PropertyItem
+        label="高度"
+        :prop="autoSize? 'runtimeHeight' : 'height'"
+        type="number"
+        :object="singleSelectedWidgetConfig"
+        :disabled="autoSize"
+        :step="1"
+      />
+      <PropertyItem
         label="X 坐标"
         prop="x"
         type="number"
@@ -61,18 +77,10 @@
         :step="1"
       />
       <PropertyItem
-        label="宽度"
-        prop="width"
-        type="number"
         :object="singleSelectedWidgetConfig"
-        :step="1"
-      />
-      <PropertyItem
-        label="高度"
-        prop="height"
-        type="number"
-        :object="singleSelectedWidgetConfig"
-        :step="1"
+        label="锚点"
+        prop="anchor"
+        type="anchor"
       />
       <el-collapse>
         <el-collapse-item
@@ -125,7 +133,7 @@ import { Component, Vue, Inject } from 'vue-property-decorator'
 import PropertyItem from '@/core/common/property-item/PropertyItem.vue'
 import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
 import DataScreenFileEditor from './DataScreenFileEditor.vue'
-import { getWidgetDefinition } from '@/widgets-data-screen'
+import { getWidgetDefinition } from '@/core/widgets-data-screen'
 
 @Component({
   components: {
@@ -156,6 +164,10 @@ export default class DataScreenPropertyInspector extends Vue {
     return getWidgetDefinition(this.singleSelectedWidgetConfig?.widgetTag || '')
   }
 
+  private get autoSize() {
+    return this.singleSelectedWidgetConfig?.isGroup || this.widgetDefinition?.autoSize
+  }
+
   public get propsGroups() {
     return this.widgetDefinition?.propsGroups || []
   }
@@ -166,12 +178,15 @@ export default class DataScreenPropertyInspector extends Vue {
 
   public get fileOptions() {
     const allProjectFile = this.projectEditor.allProjectFile
-    return Array.from(allProjectFile)
+    return [{
+      label: '不使用背景',
+      value: ''
+    },...Array.from(allProjectFile)
       .filter(([path]) => path.endsWith('.png'))
       .map(([path]) => ({
         label: path,
         value: path
-      }))
+      }))]
   }
 }
 </script>

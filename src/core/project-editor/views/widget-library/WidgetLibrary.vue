@@ -21,7 +21,7 @@ export default class WidgetLibrary extends Vue {
   }
 
   public get component() {
-    return (this.currentObjectEditor as any)?.wdgetLibrary
+    return (this.currentObjectEditor as any)?.widgetLibrary
   }
 }
 </script>

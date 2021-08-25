@@ -3,7 +3,7 @@ import { Component, Ref, Vue, Watch } from 'vue-property-decorator'
 import Jszip from 'jszip'
 import { saveAs } from 'file-saver'
 import axios from 'axios'
-import throttle from 'lodash.throttle'
+import debounce from 'lodash.debounce'
 import localforage from 'localforage'
 
 import Project from '@/core/model/Project'
@@ -41,9 +41,9 @@ export default class ProjectMixins extends Vue {
     this.saveChange(project)
   }
 
-  public saveChange = throttle((project) => {
+  public saveChange = debounce((project) => {
     localforage.setItem('project', project)
-  }, 100)
+  }, 500)
 
   /** 上传项目文件 */
   public uploadProjectFile() {

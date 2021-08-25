@@ -1,13 +1,20 @@
 import Vue from 'vue'
 
+import 'echarts'
+import '@vue/composition-api'
+
 import ElementUI from 'element-ui'
 import PortalVue from 'portal-vue'
-import draggable from "vuedraggable"
+import draggable from 'vuedraggable'
+import ECharts from 'vue-echarts'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { AgGridVue } from 'ag-grid-vue'
 
 import CoordinateSystem from '@/core/common/coordinate-system/CoordinateSystem.vue'
 
+import 'ag-grid-community/dist/styles/ag-grid.css'
+import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import 'normalize.css'
 import '@/assets/style/index.scss'
@@ -29,10 +36,11 @@ import {
   faCube,
   faEye,
   faLock,
-  faCogs
+  faCogs,
+  faFileCsv
 } from '@fortawesome/free-solid-svg-icons'
 
-import { faFile, faFileImage, faSquare } from '@fortawesome/free-regular-svg-icons'
+import { faFile, faFileImage, faSquare, faMap } from '@fortawesome/free-regular-svg-icons'
 import { faVuejs } from '@fortawesome/free-brands-svg-icons'
 
 library.add(faFont)
@@ -56,9 +64,13 @@ library.add(faLock)
 library.add(faSquare)
 library.add(faFileImage)
 library.add(faCogs)
+library.add(faMap)
+library.add(faFileCsv)
 
 Vue.use(PortalVue)
 Vue.use(ElementUI)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('vue-drag', draggable)
 Vue.component('coordinate-system', CoordinateSystem)
+Vue.component('v-chart', ECharts)
+Vue.component('AgGridVue', AgGridVue)

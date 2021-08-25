@@ -9,13 +9,13 @@
 
 *::-webkit-scrollbar {
   display: block;
-  width: 3px;
-  height: 3px;
+  width: 5px;
+  height: 5px;
 }
 
 *::-webkit-scrollbar-thumb {
   background: rgba($primary-color,0.5);
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
 *::-webkit-scrollbar-track {
@@ -252,9 +252,18 @@ body {
   .el-message-box__message {
     color: $text-color;
   }
+
+  .el-notification  {
+    background: $panel-background-color;
+    border-color: $border-color;
+  }
+  .el-notification__title,
+  .el-notification__content {
+    color: $text-color;
+  }
 }
 
-/* el-message-box */
+/* el-collapse */
 body {
   .el-collapse {
     border: none;

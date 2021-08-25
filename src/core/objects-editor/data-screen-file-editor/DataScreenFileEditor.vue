@@ -2,12 +2,12 @@
   <div class="DataScreenFileEditor" :class="mode">
     <div class="body">
       <div class="tool-bar">
-        <el-button v-if="mode === 'design-code'" size="mini" round>拆分</el-button>
-        <el-button v-else size="mini" type="text" @click="mode = 'design-code'">拆分</el-button>
         <el-button v-if="mode === 'design'" size="mini" round>视图</el-button>
         <el-button v-else size="mini" type="text" @click="mode = 'design'">视图</el-button>
         <el-button v-if="mode === 'code'" size="mini" round>代码</el-button>
         <el-button v-else size="mini" type="text" @click="mode = 'code'">代码</el-button>
+        <el-button v-if="mode === 'design-code'" size="mini" round>拆分</el-button>
+        <el-button v-else size="mini" type="text" @click="mode = 'design-code'">拆分</el-button>
       </div>
       <coordinate-system
         v-show="mode === 'design-code' || mode === 'design'"
@@ -59,6 +59,8 @@
 import { Component, Prop, Vue, Provide, Ref, Watch } from 'vue-property-decorator'
 import { encode, decode } from 'js-base64'
 import { ASTElement, ASTNode, compile } from 'vue-template-compiler'
+import throttle from 'lodash.throttle'
+import debounce from 'lodash.debounce'
 import ProjectFile from '@/core/model/ProjectFile'
 import CodeEditor from '@/core/objects-editor/code-editor/CodeEditor.vue'
 import ContextMenu from '@/core/project-editor/context-menu/ContextMenu.vue'
@@ -71,14 +73,15 @@ import DataScreenHierarchyInspector from './DataScreenHierarchyInspector.vue'
 import DataScreenWidgetLibrary from './DataScreenWidgetLibrary.vue'
 import DataScreenPreviewer from './DataScreenPreviewer.vue'
 import WidgetController from './WidgetController.vue'
-import { MessageBox } from 'element-ui'
-import { getWidgetDefinition } from '@/widgets-data-screen'
+import { MessageBox, Notification } from 'element-ui'
+import { getWidgetDefinition } from '@/core/widgets-data-screen'
 // import deepEq from 'deep-strict-equal'
 
 @Component({
   components: { CodeEditor, DataScreenPreviewer, WidgetController, ContextMenu, MeunItem, MeunItemSplitLine }
 })
 export default class DataScreenFileEditor extends Vue {
+
   @Provide('dataScreenFileEditor')
   public get dataScreenFileEditor (): DataScreenFileEditor { return this }
 
@@ -94,7 +97,7 @@ export default class DataScreenFileEditor extends Vue {
   @Ref()
   public coordinateSystem!: CoordinateSystem
 
-  private mode = 'design-code' // design code design-code
+  private mode = 'design' // design code design-code
 
   /** 选中的控件或控件组的Id数组 */
   public selectedIds: string[] = []
@@ -107,7 +110,7 @@ export default class DataScreenFileEditor extends Vue {
     return DataScreenHierarchyInspector
   }
 
-  public get wdgetLibrary() {
+  public get widgetLibrary() {
     return DataScreenWidgetLibrary
   }
 
@@ -209,23 +212,25 @@ export default class DataScreenFileEditor extends Vue {
   @Watch('dataScreenConfig', { deep: true })
   public dataScreenConfigChange(dataScreen: DataScreenConfig, oldDataScreen: DataScreenConfig) {
     if (dataScreen === oldDataScreen) {
-      console.log('DataScreen 自身变化')
+      // console.log('DataScreen 自身变化')
       const content = this.dataScreenConfig.generateCode()
       // const ast= compile(content, { outputSourceRange: false })
       // const astChange = deepEq(ast,this.ast)
       // console.log( astChange ? '语法树无变化' : '语法树发生变化')
-      this.content = content
+      this.setContentDebounce(content)
     } else {
-      console.log('重新生成的 DataScreen')
+      // console.log('重新生成的 DataScreen')
     }
   }
 
+  /** 控件拖放 */
   private handleDragover(event: DragEvent) {
     if (event.dataTransfer && event.dataTransfer.types.indexOf('widgetDefinitionTag'.toLowerCase()) !== -1) {
       event.preventDefault()
     }
   }
 
+  /** 控件拖入 */
   private handleDrop (event: DragEvent) {
     if (event.dataTransfer) {
       const widgetDefinitionTag = event.dataTransfer.getData('widgetDefinitionTag'.toLowerCase())
@@ -241,6 +246,22 @@ export default class DataScreenFileEditor extends Vue {
     this.contextMenu.open(event.clientX, event.clientY)
   }
 
+  /** 处理键盘事件 */
+  private handleKeydown (event: KeyboardEvent) {
+    if(event.code==='Delete') {
+      this.deleteAllSelectedWidgetConfig()
+    }
+  }
+
+  /** 设置文件内容 */
+  private setContent (content:string) {
+    this.content = content
+  }
+
+  private setContentThrottle = throttle(this.setContent, 250)
+  private setContentDebounce = debounce(this.setContent, 250)
+
+  /** 添加一个控件 */
   public addWidget(widgetTag: string, x?: number, y?: number) {
     const widgetConfig = new WidgetConfig()
     const widgetDefinition = getWidgetDefinition(widgetTag)
@@ -255,6 +276,15 @@ export default class DataScreenFileEditor extends Vue {
 
   /** 删除所选中的控件 */
   public async deleteAllSelectedWidgetConfig () {
+    if (this.selectedIds.length === 0) {
+      Notification({
+        title: '提示',
+        message: '没有选中的控件。',
+        position: 'bottom-right',
+        duration: 1000
+      })
+      return
+    }
     try {
       await MessageBox.confirm('是否删除选中的控件？', '提示', {
         confirmButtonText: '确定',
@@ -299,6 +329,7 @@ export default class DataScreenFileEditor extends Vue {
     }
   }
 
+  /** 获取组件的绝对位置 */
   public getAbsolutePosition (widgetConfigId: string) {
     const widgetConfig = this.getWidgetConfigById(widgetConfigId)
     if (!widgetConfig) {
@@ -416,6 +447,12 @@ export default class DataScreenFileEditor extends Vue {
   /** 判断一个控件是否被选中 */
   public isSelectedWidgetConfigId (widgetConfigId: string) {
     return this.selectedIds.indexOf(widgetConfigId) > -1
+  }
+
+  public mounted() {
+    if (!this.content) {
+      this.content = this.dataScreenConfig.generateCode()
+    }
   }
 }
 </script>

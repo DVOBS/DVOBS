@@ -215,8 +215,8 @@ export default class CoordinateSystem extends Vue {
   public getAxisPosition(event: MouseEvent) {
     const content = this.$refs.content as HTMLDivElement
     const bc = content.getBoundingClientRect()
-    const x = (event.clientX - bc.x) / this.scale - this.offsetX
-    const y = (event.clientY - bc.y) / this.scale - this.offsetY
+    const x = ~~((event.clientX - bc.x) / this.scale - this.offsetX)
+    const y = ~~((event.clientY - bc.y) / this.scale - this.offsetY)
     return {x, y}
   }
 

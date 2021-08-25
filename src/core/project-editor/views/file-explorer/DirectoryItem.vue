@@ -176,7 +176,7 @@ export default class DirectoryItem extends Vue {
         }
         reader.readAsDataURL(file);
       } catch (error) {
-        console.log(error)
+        // console.log(error)
       }
     }
   }

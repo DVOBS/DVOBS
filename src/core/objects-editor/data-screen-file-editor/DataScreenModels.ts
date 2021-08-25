@@ -1,4 +1,4 @@
-import { getWidgetDefinition } from '@/widgets-data-screen'
+import { getWidgetDefinition } from '@/core/widgets-data-screen'
 import shortid from 'shortid'
 import Vue from 'vue'
 import { ASTElement } from 'vue-template-compiler'
@@ -90,6 +90,12 @@ export class DataScreenConfig {
   }
 }
 
+const anchorValues = [
+  'left-top', 'center-top', 'right-top',
+  'left-center', 'center', 'right-center',
+  'left-bottom', 'center-bottom', 'right-bottom'
+]
+
 export class WidgetConfig {
   /** 组件名称 */
   public name = '组件';
@@ -165,6 +171,13 @@ export class WidgetConfig {
           case 'lock':
             this.lock = valueOfAttr(value)
             break
+          case 'anchor': {
+            const anchor = valueOfAttr(value)
+            if (anchorValues.indexOf(anchor) !== -1) {
+              this.anchor = valueOfAttr(value)
+            }
+            break
+          }
           default:
             break
         }
@@ -226,15 +239,19 @@ export class WidgetConfig {
   public generateCode(depth: number) {
     const tag = this.isGroup ? 'WidgetGroup' : 'Widget'
     const widgetTag = this.widgetTag
+    const widgetDefinition = getWidgetDefinition(widgetTag)
     let code = `${space(depth * 2)}<${tag}\n`
     code += `${space(depth * 2 + 2)}name="${this.name}"\n`
     code += `${space(depth * 2 + 2)}ref="${this.id}"\n`
     code += `${space(depth * 2 + 2)}:visible="${this.visible}"\n`
     code += `${space(depth * 2 + 2)}:lock="${this.lock}"\n`
+    if (!this.isGroup && !widgetDefinition?.autoSize) {
+      code += `${space(depth * 2 + 2)}:width="${this.width}"\n`
+      code += `${space(depth * 2 + 2)}:height="${this.height}"\n`
+    }
     code += `${space(depth * 2 + 2)}:x="${this.x}"\n`
     code += `${space(depth * 2 + 2)}:y="${this.y}"\n`
-    code += `${space(depth * 2 + 2)}:width="${this.width}"\n`
-    code += `${space(depth * 2 + 2)}:height="${this.height}"\n`
+    code += `${space(depth * 2 + 2)}anchor="${this.anchor}"\n`
     code += `${space(depth * 2)}>\n`
     if (this.isGroup) {
       for (const widgetConfig of this.children) {
@@ -242,7 +259,6 @@ export class WidgetConfig {
       }
     } else if(widgetTag) {
       code += `${space(depth * 2 + 2)}<${widgetTag}\n`
-      const widgetDefinition = getWidgetDefinition(widgetTag)
       for (const propsGroup of widgetDefinition?.propsGroups || []) {
         for (const prop of propsGroup.props) {
           const key = prop.key

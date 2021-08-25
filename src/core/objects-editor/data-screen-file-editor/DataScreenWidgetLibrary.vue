@@ -33,10 +33,10 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Inject } from 'vue-property-decorator'
-import { widgetGroups } from '@/widgets-data-screen/index'
+import { widgetGroups } from '@/core/widgets-data-screen/index'
 import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
 import DataScreenFileEditor from './DataScreenFileEditor.vue'
-import { WidgetDefinition } from '@/widgets-data-screen/WidgetDefinition'
+import { WidgetDefinition } from '@/core/widgets-data-screen/WidgetDefinition'
 
 @Component
 export default class DataScreenWidgetLibrary extends Vue {
@@ -67,6 +67,7 @@ export default class DataScreenWidgetLibrary extends Vue {
 .DataScreenWidgetLibrary {
   height: 100%;
   padding: 10px;
+  overflow-y: auto;
   .filter {
     padding: 0px 0px 5px;
   }

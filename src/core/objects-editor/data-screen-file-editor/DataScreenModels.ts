@@ -142,6 +142,8 @@ export class WidgetConfig {
 
   public isGroup = false
 
+  public dataFile = ''
+
   constructor(ast?: ASTElement) {
     if (ast?.tag === 'Widget' || ast?.tag === 'WidgetGroup') {
       const attrs = ast.attrs || []
@@ -170,6 +172,9 @@ export class WidgetConfig {
             break
           case 'lock':
             this.lock = valueOfAttr(value)
+            break
+          case 'dataFile':
+            this.dataFile = valueOfAttr(value)
             break
           case 'anchor': {
             const anchor = valueOfAttr(value)
@@ -252,6 +257,7 @@ export class WidgetConfig {
     code += `${space(depth * 2 + 2)}:x="${this.x}"\n`
     code += `${space(depth * 2 + 2)}:y="${this.y}"\n`
     code += `${space(depth * 2 + 2)}anchor="${this.anchor}"\n`
+    code += `${space(depth * 2 + 2)}dataFile="${this.dataFile}"\n`
     code += `${space(depth * 2)}>\n`
     if (this.isGroup) {
       for (const widgetConfig of this.children) {

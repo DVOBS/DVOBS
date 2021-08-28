@@ -10,6 +10,7 @@
         v-if="component"
         v-bind="attrs"
         :is="component"
+        :dataSource="dataSource"
       ></component>
     </template>
     <template v-else>
@@ -22,15 +23,21 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch, Inject } from 'vue-property-decorator'
 import { addListener, removeListener } from 'resize-detector'
+import ProjectEditor from '@/core/project-editor/ProjectEditor.vue'
 import { getWidgetDefinition } from '@/core/widgets-data-screen'
 import { WidgetConfig } from './DataScreenModels'
+import { decode } from 'js-base64'
+import { parse } from 'papaparse'
 
 @Component({
   name: 'WidgetWrapper'
 })
 export default class WidgetWrapper extends Vue {
+  @Inject('projectEditor')
+  public projectEditor!: ProjectEditor
+
   @Prop()
   public widgetConfig !: WidgetConfig
 
@@ -119,6 +126,22 @@ export default class WidgetWrapper extends Vue {
 
   public get visible() {
     return this.widgetConfig.visible
+  }
+
+  public get dataSource() {
+    const dataFilePath = this.widgetConfig.dataFile
+    const dataFile = this.projectEditor.allProjectFile.get(dataFilePath)
+    try {
+      if (dataFile && dataFilePath.endsWith('.json')) {
+        return JSON.parse(decode(dataFile?.base64))
+      } else if (dataFile && dataFilePath.endsWith('.csv')) {
+        return parse(decode(dataFile?.base64), {header: true, dynamicTyping: true})
+      }
+    } catch (error) {
+      console.log(error)
+    }
+
+    return {}
   }
 
   private resizeHandler() {

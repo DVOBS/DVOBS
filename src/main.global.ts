@@ -13,8 +13,9 @@ import { AgGridVue } from 'ag-grid-vue'
 
 import CoordinateSystem from '@/core/common/coordinate-system/CoordinateSystem.vue'
 
-import 'ag-grid-community/dist/styles/ag-grid.css'
-import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css'
+// import 'ag-grid-community/dist/styles/ag-grid.css'
+// import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css'
+import 'handsontable/dist/handsontable.full.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import 'normalize.css'
 import '@/assets/style/index.scss'

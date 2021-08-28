@@ -2,6 +2,7 @@ import SimpleTextArea from './simple/simple-text-area/index'
 import SimpleText from './simple/simple-text/index'
 import PointsEarth from './webgl/points-earth/index'
 import EchartsBaseBar from './echarts/echarts-base-bar/index'
+import SimpleDataView from './simple/simple-data-view/index'
 import { WidgetDefinition } from './WidgetDefinition'
 
 export const widgetDefinitionMap: Map<string, WidgetDefinition> = new Map()
@@ -37,6 +38,7 @@ const webglGroup = {
   widgetDefinitions: []
 }
 
+addWidgetDefinition(SimpleDataView, simpleGroup)
 addWidgetDefinition(SimpleText, simpleGroup)
 addWidgetDefinition(SimpleTextArea, simpleGroup)
 addWidgetDefinition(EchartsBaseBar, echartsGroup)

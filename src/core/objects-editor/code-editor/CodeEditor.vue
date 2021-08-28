@@ -57,6 +57,7 @@ export default class CodeEditor extends Vue {
     const w = $el.clientWidth
     const h = $el.clientHeight
     this.cminstance.setSize(w, h)
+    this.cminstance.refresh()
   }
 
   public mounted() {

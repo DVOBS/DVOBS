@@ -11,32 +11,66 @@
       :color3="color3"
       :glowColor="glowColor"
       :outlineColor="outlineColor"
-    ></PointsGlobal>
+    >
+      <TaperBar
+        v-for="location in locations"
+        :key="location[0]"
+        :position="latLongToVector3(location[1], location[2], 0)"
+        :color="color3"
+        :value="location[3]"
+      ></TaperBar>
+    </PointsGlobal>
   </MainScene>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import MainScene from './MainScene'
 import PointsGlobal from './PointsGlobal'
+import TaperBar from './TaperBar';
 
 @Component({
-  components: { MainScene, PointsGlobal }
+  components: { MainScene, PointsGlobal, TaperBar }
 })
 export default class PointsEarth extends Vue {
   @Prop({ default: '#ee8844' })
-  private color1!: string
+  public color1!: string
 
   @Prop({ default: '#2266ee' })
-  private color2!: string
+  public color2!: string
 
   @Prop({ default: '#2288ff' })
-  private color3!: string
+  public color3!: string
 
   @Prop({ default: '#4488ff' })
-  private glowColor!: string
+  public glowColor!: string
 
   @Prop({ default: '#ff8800' })
-  private outlineColor!: string
+  public outlineColor!: string
+
+  public get locations() {
+    const locations = []
+    for (let index = 0; index < 250; index++) {
+      locations.push(
+        ['index-' + index,~~(Math.random() * 360 - 180),~~(Math.random() * 180 - 90),~~(Math.random() * 50 + 15)]
+      )
+    }
+    return locations
+  }
+
+  public latLongToVector3(lng:number, lat:number, height:number) {
+    const r = 200 + height;
+    let x = 0;
+    let y = 0;
+    let z = 0;
+
+    y = Math.sin(lat / 180 * Math.PI) * r;
+    const r0 = Math.cos(lat / 180 * Math.PI) * r;
+
+    x = Math.sin(lng / 180 * Math.PI) * r0;
+    z = Math.cos(lng / 180 * Math.PI) * r0;
+
+    return [x, y, z];
+  }
 }
 </script>
 <style scoped lang="scss">

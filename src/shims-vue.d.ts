@@ -4,3 +4,4 @@ declare module '*.vue' {
 }
 
 declare module 'deep-strict-equal'
+declare module 'handsontable/i18n/index'

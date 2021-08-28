@@ -124,7 +124,7 @@ export default class ProjectMixins extends Vue {
           if (parentPath) {
             const parentDirectory = dirs[parentPath]
             if (!parentDirectory) {
-              debugger
+              // debugger
             }
             parentDirectory.directorys.push(dir)
           } else {

@@ -41,7 +41,7 @@
         label="数据查看器"
         name="data-inspector"
       >
-        <p>数据查看器</p>
+        <DataInspector></DataInspector>
       </ViewPanel>
       <ViewPanel
         label="控制台"
@@ -86,6 +86,7 @@ import ViewPanel from './view-layout/ViewPanel.vue'
 import ObjectEditorTabs from '@/core/project-editor/object-editor-tabs/ObjectEditorTabs.vue'
 import FileExplorer from '@/core/project-editor/views/file-explorer/FileExplorer.vue'
 import PropertyInspector from '@/core/project-editor/views/property-inspector/PropertyInspector.vue'
+import DataInspector from '@/core/project-editor/views/data-inspector/DataInspector.vue'
 import HierarchyInspector from '@/core/project-editor/views/hierarchy-inspector/HierarchyInspector.vue'
 import WidgetLibrary from '@/core/project-editor/views/widget-library/WidgetLibrary.vue'
 
@@ -99,6 +100,7 @@ import EditableObject from '@/core/model/EditableObject'
     ViewPanel,
     FileExplorer,
     PropertyInspector,
+    DataInspector,
     HierarchyInspector,
     WidgetLibrary
   }
@@ -131,6 +133,9 @@ export default class ProjectEditor extends Mixins(ProjectMixins, ContextMenuMixi
   }
 
   private handleKeydown (event: KeyboardEvent) {
+    if ((event as any).skip) {
+      return
+    }
     const sub = (this.currentObjectEditor as any)
     if (sub && sub.handleKeydown) {
       sub.handleKeydown(event)

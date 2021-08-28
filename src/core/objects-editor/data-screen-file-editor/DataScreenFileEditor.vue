@@ -2,11 +2,11 @@
   <div class="DataScreenFileEditor" :class="mode">
     <div class="body">
       <div class="tool-bar">
-        <el-button v-if="mode === 'design'" size="mini" round>视图</el-button>
+        <el-button v-if="mode === 'design'" size="mini">视图</el-button>
         <el-button v-else size="mini" type="text" @click="mode = 'design'">视图</el-button>
-        <el-button v-if="mode === 'code'" size="mini" round>代码</el-button>
+        <el-button v-if="mode === 'code'" size="mini">代码</el-button>
         <el-button v-else size="mini" type="text" @click="mode = 'code'">代码</el-button>
-        <el-button v-if="mode === 'design-code'" size="mini" round>拆分</el-button>
+        <el-button v-if="mode === 'design-code'" size="mini">拆分</el-button>
         <el-button v-else size="mini" type="text" @click="mode = 'design-code'">拆分</el-button>
       </div>
       <coordinate-system
@@ -72,13 +72,14 @@ import DataScreenPropertyInspector from './DataScreenPropertyInspector.vue'
 import DataScreenHierarchyInspector from './DataScreenHierarchyInspector.vue'
 import DataScreenWidgetLibrary from './DataScreenWidgetLibrary.vue'
 import DataScreenPreviewer from './DataScreenPreviewer.vue'
+import DataScreenDataInspector from './DataScreenDataInspector.vue'
 import WidgetController from './WidgetController.vue'
 import { MessageBox, Notification } from 'element-ui'
 import { getWidgetDefinition } from '@/core/widgets-data-screen'
 // import deepEq from 'deep-strict-equal'
 
 @Component({
-  components: { CodeEditor, DataScreenPreviewer, WidgetController, ContextMenu, MeunItem, MeunItemSplitLine }
+  components: { CodeEditor, DataScreenPreviewer, WidgetController, ContextMenu, MeunItem, MeunItemSplitLine, DataScreenDataInspector }
 })
 export default class DataScreenFileEditor extends Vue {
 
@@ -112,6 +113,10 @@ export default class DataScreenFileEditor extends Vue {
 
   public get widgetLibrary() {
     return DataScreenWidgetLibrary
+  }
+
+  public get dataInspector() {
+    return DataScreenDataInspector
   }
 
   public get content() {
@@ -469,9 +474,8 @@ export default class DataScreenFileEditor extends Vue {
   }
   .tool-bar {
     text-align: left;
-    padding-left: 5px;
     height: 32px;
-    line-height: 28px;
+    line-height: 32px;
     background: $panel-background-color;
   }
 

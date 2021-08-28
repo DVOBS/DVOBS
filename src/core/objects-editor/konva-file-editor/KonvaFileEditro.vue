@@ -248,6 +248,7 @@ export default class KonvaFileEditro extends Vue {
   }
 
   public onResize (div: HTMLElement) {
+    console.log(div)
     // this.width = div.clientWidth
     // this.height = div.clientHeight
   }

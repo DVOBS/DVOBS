@@ -1,4 +1,4 @@
-import Object3D from '@/core/v3c/Object3D';
+import Object3D from '@/core/v3c/Object3D'
 import * as THREE from 'three'
 import { Component, Prop, Watch } from 'vue-property-decorator'
 import * as d3 from 'd3'

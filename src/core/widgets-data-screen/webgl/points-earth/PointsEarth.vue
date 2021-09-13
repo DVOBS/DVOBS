@@ -19,6 +19,16 @@
         :color="color3"
         :value="location[3]"
       ></TaperBar>
+      <ThreeArcsSnake
+        v-for="path in paths"
+        :key="path[0]"
+        :lng="path[1]"
+        :lat="path[2]"
+        :toLng="path[3]"
+        :toLat="path[4]"
+        :color="path[5]"
+        :show="true"
+      />
     </PointsGlobal>
   </MainScene>
 </template>
@@ -26,10 +36,12 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import MainScene from './MainScene'
 import PointsGlobal from './PointsGlobal'
-import TaperBar from './TaperBar';
+import TaperBar from './TaperBar'
+import ThreeArcsSnake from './ThreeArcsSnake'
+import { Color } from 'three'
 
 @Component({
-  components: { MainScene, PointsGlobal, TaperBar }
+  components: { MainScene, PointsGlobal, TaperBar, ThreeArcsSnake }
 })
 export default class PointsEarth extends Vue {
   @Prop({ default: '#ee8844' })
@@ -55,6 +67,21 @@ export default class PointsEarth extends Vue {
       )
     }
     return locations
+  }
+
+  public get paths() {
+    const paths = []
+    for (let index = 0; index < 1000; index++) {
+      paths.push([
+        index,
+        ~~( Math.random() * 360 - 180),
+        ~~( Math.random() * 180 - 90),
+        ~~( Math.random() * 360 - 180),
+        ~~( Math.random() * 180 - 90),
+        '#' + new Color(Math.random(), Math.random(), Math.random()).getHexString()
+      ])
+    }
+    return paths
   }
 
   public latLongToVector3(lng:number, lat:number, height:number) {

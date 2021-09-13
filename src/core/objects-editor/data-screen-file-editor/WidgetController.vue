@@ -1,6 +1,6 @@
 <template>
   <div
-    v-show="visible && (!lock || isSelected)"
+    v-show="visible && (!lock || isSelected || hasChildSelected)"
     class="WidgetController"
     :class="{
       isSelected,
